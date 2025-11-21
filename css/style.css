@@ -1,0 +1,70 @@
+.hover-border-red {
+    border: 1px solid #f7f7f7 !important;
+}
+
+.hover-border-red:hover {
+    border-color: #dc3545 !important;
+}
+
+/* Căn chỉnh khoảng cách cho Slick */
+.slick-list {
+    margin: 0 -10px;
+}
+
+.product-item {
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.brand {
+    cursor: pointer;
+}
+
+.card {
+    position: relative;
+}
+
+/* Chỉnh cho mũi tên để dễ nhìn hơn */
+.slick-prev,
+.slick-next {
+    z-index: 10;
+    width: 30px;
+    height: 30px;
+}
+
+/* Điều chỉnh icon mũi tên */
+.slick-prev:before,
+.slick-next:before {
+    color: black;
+    font-size: 30px;
+}
+
+.slick-prev {
+    left: -15px;
+}
+
+.slick-next {
+    right: -15px;
+}
+
+.makeup-card {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.makeup-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.form-control:focus {
+    /* Loại bỏ thuộc tính box-shadow mà Bootstrap sử dụng cho focus */
+    box-shadow: none;
+
+    /* Đảm bảo viền cũng không bị thay đổi (nếu cần) */
+    border-color: #ced4da;
+    /* Giữ màu viền mặc định của Bootstrap */
+}
