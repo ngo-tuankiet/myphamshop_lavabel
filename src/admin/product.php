@@ -72,32 +72,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="brand">Admin Panel</div>
-        <nav>
-            <a href="dashboard.php">
-                <i class="fas fa-chart-line me-2"></i> Dashboard
-            </a>
-            <a href="product.php" class="active">
-                <i class="fas fa-box me-2"></i> Quản lý sản phẩm
-            </a>
-            <a href="brand.php">
-                <i class="fas fa-tag me-2"></i> Quản lý thương hiệu
-            </a>
-            <a href="order.php">
-                <i class="fas fa-shopping-cart me-2"></i> Quản lý đơn hàng
-            </a>
-            <a href="user.php">
-                <i class="fas fa-users me-2"></i> Quản lý tài khoản
-            </a>
-            <a href="category.php">
-                <i class="fas fa-list me-2"></i> Quản lý loại sản phẩm
-            </a>
-            <a href="#" class="text-danger">
-                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
-            </a>
-        </nav>
-    </div>
+    <?php include '../includes/sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -478,7 +453,7 @@
                 if (product.images && product.images.length > 0) {
                     imagesHtml = '<div class="mb-3"><strong>Hình ảnh:</strong><div class="mt-2">';
                     product.images.forEach(img => {
-                        imagesHtml += `<img src="http://localhost:8000/storage/${img.url}" class="image-preview" onerror="this.src='https://via.placeholder.com/100?text=No+Image'">`;
+                        imagesHtml += `<img src="http://localhost:8000/storage/app/public/${img.url}" class="image-preview" onerror="this.src='https://via.placeholder.com/100?text=No+Image'">`;
                     });
                     imagesHtml += '</div></div>';
                 }
