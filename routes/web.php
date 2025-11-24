@@ -16,4 +16,6 @@ use Illuminate\Http\Request;
 |
 */
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+require __DIR__ . '/cart.php';
+require __DIR__ . '/order.php';

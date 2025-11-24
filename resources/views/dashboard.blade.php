@@ -1,17 +1,29 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thanh toán</title>
+</head>
+<body>
+    <h2>Thông tin giao hàng</h2>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    You're logged in!
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+    <form method="POST" action="{{ route('checkout.place') }}">
+        @csrf
+
+        Họ và tên: <input type="text" name="fullname" required><br><br>
+        Số điện thoại: <input type="text" name="phone" required><br><br>
+        Địa chỉ nhận hàng: <input type="text" name="address" required><br><br>
+        Ghi chú: <textarea name="note"></textarea><br><br>
+
+        <h3>Giỏ hàng của bạn:</h3>
+
+        <ul>
+            @foreach ($cart as $item)
+                <li>{{ $item['name'] }} - {{ $item['quantity'] }} x {{ number_format($item['price']) }}đ</li>
+            @endforeach
+        </ul>
+
+        <button type="submit">Đặt hàng</button>
+    </form>
+
+</body>
+</html>

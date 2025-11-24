@@ -24,8 +24,7 @@ Route::get('/verify-email/{token}', function ($token) {
         'email' => $pending->email,
         'password' => $pending->password,
         'email_verified_at' => now(),
-        'created_at' => now(),
-        'updated_at' => now(),
+        
     ]);
 
     $pending->delete();
