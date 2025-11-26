@@ -7,6 +7,7 @@ require_once 'components/brand-section.php';
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +15,8 @@ require_once 'components/brand-section.php';
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
@@ -23,6 +24,7 @@ require_once 'components/brand-section.php';
         #main-spinner {
             padding: 40px 0;
         }
+
         #main-spinner .spinner-border {
             width: 3rem;
             height: 3rem;
@@ -111,11 +113,28 @@ require_once 'components/brand-section.php';
     <script>
         $(document).ready(function () {
             // Khi trang đã load xong, ẩn spinner chung và hiển thị tất cả section
-            $("#main-spinner").fadeOut(200, function() {
-                $(".section-block").fadeIn(300);
+            $("#main-spinner").fadeOut(200, function () {
+                $(".section-block").fadeIn(300, function () {
+                    // Khởi tạo Slick AFTER các section đã hiển thị
+                    $('.product-slider').slick({
+                        dots: false,
+                        infinite: true,
+                        speed: 500,
+                        arrows: true,
+                        slidesToShow: 4,
+                        slidesToScroll: 1,
+                        responsive: [
+                            { breakpoint: 1200, settings: { slidesToShow: 4 } },
+                            { breakpoint: 992, settings: { slidesToShow: 3 } },
+                            { breakpoint: 768, settings: { slidesToShow: 2 } },
+                            { breakpoint: 576, settings: { slidesToShow: 1 } }
+                        ]
+                    });
+                });
             });
         });
     </script>
 
 </body>
+
 </html>

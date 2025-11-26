@@ -10,7 +10,7 @@ function renderSliderSection($title, $products, $viewAllLink = '#')
         <div class="border-bottom border-1" style="border-color: #e7dfdfff !important;"></div>
         <div class="product-slider">
             <?php foreach ($products as $product): ?>
-                <div class="p-2 product-item overflow-auto">
+                <div class="p-2 product-item overflow-auto" onclick="window.location.href='product-detail.php?id=<?= $product['id'] ?>'">
                     <div class="card border border-light text-center p-2 position-relative hover-border-red cursor-pointer">
                         <div class="position-relative">
                             <img src="http://localhost:8000/storage/<?= $product['image'] ?>" class="card-img-top img-fluid" />
@@ -31,25 +31,7 @@ function renderSliderSection($title, $products, $viewAllLink = '#')
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Khởi tạo TẤT CẢ sliders có class 'product-slider'
-            $('.product-slider').slick({
-                dots: false,
-                infinite: true,
-                speed: 500,
-                arrows: true,
-                slidesToShow: 4,
-                slidesToScroll: 1,
-                responsive: [
-                    { breakpoint: 1200, settings: { slidesToShow: 4 } },
-                    { breakpoint: 992, settings: { slidesToShow: 3 } },
-                    { breakpoint: 768, settings: { slidesToShow: 2 } },
-                    { breakpoint: 576, settings: { slidesToShow: 1 } }
-                ]
-            });
-        });
-    </script>
+    
     <?php
 }
 ?>
