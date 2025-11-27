@@ -5,7 +5,6 @@ function renderSliderSection($title, $products, $viewAllLink = '#')
     <div class="mt-5 bg-white">
         <div class="container d-flex justify-content-between align-items-center p-3">
             <h4 class="text-danger fw-bold mb-0"><?= $title ?></h4>
-            <a href="<?= $viewAllLink ?>" class="text-danger text-decoration-none fw-bold">XEM TẤT CẢ</a>
         </div>
         <div class="border-bottom border-1" style="border-color: #e7dfdfff !important;"></div>
         <div class="product-slider">

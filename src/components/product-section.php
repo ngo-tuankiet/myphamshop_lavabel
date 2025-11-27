@@ -1,18 +1,20 @@
 <?php
-function renderProductSection($config) {
+function renderProductSection($config)
+{
     $defaults = [
         'sidebarPosition' => 'left', // 'left' hoặc 'right'
         'sidebarTitle' => '',
         'sidebarImage' => '',
         'tabs' => [],
         'products' => [],
-        'showViewMore' => true
+        'showViewMore' => true,
+        'viewMoreLink' => 'products.php'
     ];
-    
+
     $config = array_merge($defaults, $config);
     $isLeftSidebar = $config['sidebarPosition'] === 'left';
     ?>
-    
+
     <div class="mt-5 d-flex bg-white">
         <?php if ($isLeftSidebar): ?>
             <?php renderSidebar($config['sidebarTitle'], $config['sidebarImage']); ?>
@@ -22,8 +24,7 @@ function renderProductSection($config) {
         <div class="col-10">
             <div class="tab-content">
                 <!-- Tab Navigation -->
-                <div class="p-3 d-flex justify-content-between align-items-center" 
-                     style="background-color: #e0e0e0;">
+                <div class="p-3 d-flex justify-content-between align-items-center" style="background-color: #e0e0e0;">
                     <?php if ($isLeftSidebar): ?>
                         <div class="d-flex gap-4">
                             <?php foreach ($config['tabs'] as $tab): ?>
@@ -31,11 +32,11 @@ function renderProductSection($config) {
                             <?php endforeach; ?>
                         </div>
                         <?php if ($config['showViewMore']): ?>
-                            <a href="#" class="text-danger text-decoration-none fw-bold">XEM THÊM</a>
+                            <a href="<?= $config['viewMoreLink'] ?>" class="text-danger text-decoration-none fw-bold">XEM THÊM</a>
                         <?php endif; ?>
                     <?php else: ?>
                         <?php if ($config['showViewMore']): ?>
-                            <a href="#" class="text-danger text-decoration-none fw-bold">XEM THÊM</a>
+                            <a href="<?= $config['viewMoreLink'] ?>" class="text-danger text-decoration-none fw-bold">XEM THÊM</a>
                         <?php endif; ?>
                         <div class="d-flex gap-4">
                             <?php foreach ($config['tabs'] as $tab): ?>
@@ -63,7 +64,8 @@ function renderProductSection($config) {
     <?php
 }
 
-function renderSidebar($title, $image) {
+function renderSidebar($title, $image)
+{
     ?>
     <div class="col-2 d-flex flex-column">
         <div class="bg-dark p-3 text-white fw-bold text-center"><?= $title ?></div>

@@ -1,6 +1,6 @@
 <header class="container mt-2 d-flex justify-content-between align-items-center p-3 bg-white">
     <div class="col-3">
-        <a class="text-decoration-none fs-4 fw-bold text-danger" href="#">BEAUTY LUX</a>
+        <a class="text-decoration-none fs-4 fw-bold text-danger" href="index.php">BEAUTY LUX</a>
     </div>
     <div class="col-5 d-flex">
         <input type="text" class="form-control rounded-end-0" 
