@@ -1,5 +1,5 @@
 <?php
-function renderBrandSection($title, $brands, $viewAllLink = 'products.php')
+function renderBrandSection($title, $brands, $viewAllLink = 'brands.php')
 {
     ?>
     <div class="mt-5 bg-white">

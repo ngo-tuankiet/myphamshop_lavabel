@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        body { background-color: #f5f5f5; }
+        body {
+            background-color: #f5f5f5;
+        }
+
         .sidebar {
             position: fixed;
             top: 0;
@@ -18,12 +22,14 @@
             color: white;
             overflow-y: auto;
         }
+
         .sidebar .brand {
             padding: 1.5rem;
             font-size: 1.5rem;
             font-weight: bold;
             color: #dc3545;
         }
+
         .sidebar nav a {
             display: block;
             padding: 0.875rem 1.5rem;
@@ -31,33 +37,61 @@
             text-decoration: none;
             transition: background-color 0.2s;
         }
-        .sidebar nav a:hover { background-color: #334155; }
+
+        .sidebar nav a:hover {
+            background-color: #334155;
+        }
+
         .sidebar nav a.active {
             background-color: #334155;
             border-left: 4px solid #3b82f6;
         }
+
         .main-content {
             margin-left: 250px;
             min-height: 100vh;
         }
+
         .header {
             background-color: white;
             border-bottom: 1px solid #e5e7eb;
             padding: 1rem 2rem;
         }
+
         .badge-status {
             padding: 0.35rem 0.65rem;
             border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
         }
-        .status-1 { background-color: #fef3c7; color: #92400e; }
-        .status-2 { background-color: #dbeafe; color: #1e40af; }
-        .status-3 { background-color: #e0e7ff; color: #3730a3; }
-        .status-4 { background-color: #d1fae5; color: #065f46; }
-        .status-5 { background-color: #fee2e2; color: #991b1b; }
+
+        .status-1 {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-2 {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-3 {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-4 {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-5 {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <?php include '../includes/sidebar.php'; ?>
@@ -80,7 +114,8 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <input type="text" id="search-input" class="form-control" placeholder="Tìm mã đơn, tên, SĐT...">
+                            <input type="text" id="search-input" class="form-control"
+                                placeholder="Tìm mã đơn, tên, SĐT...">
                         </div>
                         <div class="col-md-3">
                             <select id="status-filter" class="form-select">
@@ -215,7 +250,7 @@
 
                 const search = document.getElementById('search-input').value;
                 const status = document.getElementById('status-filter').value;
-                
+
                 let url = `${API_BASE_URL}/orders?`;
                 if (search) url += `search=${encodeURIComponent(search)}&`;
                 if (status) url += `status=${status}`;
@@ -350,4 +385,5 @@
         });
     </script>
 </body>
+
 </html>
