@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Xác minh email</title>
+    <meta charset="UTF-8">
+    <title>Xác minh tài khoản</title>
 </head>
 <body>
-  <h2>Xác minh địa chỉ Gmail của bạn</h2>
 
-  <p>Chúng tôi đã gửi một liên kết xác minh đến email của bạn.</p>
+<h2>Xác minh tài khoản MyPhamShop</h2>
 
-  @if (session('message'))
-    <p style="color: green">{{ session('message') }}</p>
-  @endif
+<p>Nhấn vào liên kết bên dưới để kích hoạt tài khoản của bạn:</p>
 
-  <form method="POST" action="{{ route('verification.send') }}">
-    @csrf
-    <button type="submit">Gửi lại email xác minh</button>
-  </form>
+<p>
+    <a href="{{ $url }}" target="_blank" style="font-size:18px; color:#0d6efd;">
+        👉 BẤM VÀO ĐÂY ĐỂ XÁC MINH TÀI KHOẢN
+    </a>
+</p>
+
+<p>Nếu bạn không đăng ký tài khoản này, hãy bỏ qua email này.</p>
+
+<p>Trân trọng,<br>MyPhamShop</p>
+
 </body>
 </html>

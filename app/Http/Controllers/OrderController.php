@@ -8,88 +8,109 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function checkout()
-    {
-        $cart = session('cart', []);
-        if (empty($cart))
-            return redirect('/cart')->with('error', 'Gio hàng của bạn đang trống');
-        return view('orders.checkout', compact('cart'));
-    }
+   
     public function placeOrder(Request $request)
     {
         $request->validate([
-            'fullame' => 'required|string|max:150',
-            'phone' => 'required|string|max:12',
-            'address' => 'required|string|max:255',
-            'note' => 'nullable|string|max:255',
+            'fullname' => 'required|string|max:150',
+            'phone'    => 'required|string|max:12',
+            'address'  => 'required|string|max:255',
+            'note'     => 'nullable|string|max:255',
+            'cart'     => 'required|array'
         ]);
-        $cart = session('cart', []);
-        if (empty($cart))
-            return redirect('/cart')->with('error', 'Gio hàng  trống,không thể đặt hàng');
+
+        $cart = $request->cart; 
+
+        if (empty($cart)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Giỏ hàng trống, không thể đặt hàng'
+            ], 400);
+        }
 
         DB::beginTransaction();
         try {
+
             $orderId = DB::table('orders')->insertGetId([
-                'code' => rand(10000, 99999),
-                'user_id' => Auth::id(),
-                'total_amount' => collect($cart)->sum(function ($item) {
-                    return $item['price'] * $item['quantity'];
-                }),
-                'status' => 1,
-                'customer_name' => $request->fullname,
-                'customer_phone' => $request->phone,
-                'customer_address' => $request->address,
-                'note' => $request->note,
-                'created_at' => now(),
+                'code'            => rand(10000, 99999),
+               'user_id' => $request->user_id ?? null,
+                'total_amount'    => collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']),
+                'status'          => 1, 
+                'customer_name'   => $request->fullname,
+                'customer_phone'  => $request->phone,
+                'customer_address'=> $request->address,
+                'note'            => $request->note,
+                'created_at'      => now(),
             ]);
+
             foreach ($cart as $item) {
                 DB::table('order_details')->insert([
-                    'order_id' => $orderId,
-                    'product_id' => $item['id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
+                    'order_id'  => $orderId,
+                    'product_id'=> $item['product_id'],
+                    'quantity'  => $item['quantity'],
+                    'price'     => $item['price']
                 ]);
             }
-            session()->forget('cart');
+            if ($request->userId) {
+            DB::table('cart_items')->where('user_id', $request->userId)->delete();
+        }
             DB::commit();
-            return redirect('/orders/success')->with('success', 'Đặt hàng thành công');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đặt hàng thành công',
+                'data' => ['order_id' => $orderId]
+            ]);
+
         } catch (\Exception $e) {
+
             DB::rollBack();
-            return back()->with('error', 'Lỗi khi đặt hàng' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi đặt hàng',
+                'error'   => $e->getMessage()
+            ], 500);
         }
     }
-    public function success()
-    {
-        return view('orders.success');
-    }
-    public function myOrders()
+
+    // ===========================
+    // 2. API lấy danh sách đơn hàng của user
+    // ===========================
+    public function listOrders($userId)
     {
         $orders = DB::table('orders')
-            ->where('user_id', Auth::id())
+            ->where('user_id', $userId)
             ->orderBy('created_at', 'DESC')
             ->get();
 
-        return view('orders.my_orders', compact('orders'));
+        return response()->json([
+            'success' => true,
+            'data'    => $orders
+        ]);
     }
 
+    // ===========================
+    // 3. API xem chi tiết đơn hàng
+    // ===========================
     public function orderDetail($id)
     {
-        $order = DB::table('orders')
-            ->where('id', $id)
-            ->where('user_id', Auth::id())   // user chỉ xem được đơn của mình
-            ->first();
+        $order = DB::table('orders')->where('id', $id)->first();
 
         if (!$order) {
-            return redirect('/my-orders')->with('error', 'Không tìm thấy đơn hàng!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng'
+            ], 404);
         }
 
         $items = DB::table('order_details')
             ->join('products', 'order_details.product_id', '=', 'products.id')
-            ->leftJoin('productimage', 'products.id', '=', 'productimage.product_id')
+            ->leftJoin('product_image', 'products.id', '=', 'product_image.product_id')
             ->select(
                 'order_details.*',
                 'products.name as product_name',
-                DB::raw('GROUP_CONCAT(productimage.url) as images')
+                DB::raw('GROUP_CONCAT(product_image.url) as images')
             )
             ->where('order_details.order_id', $id)
             ->groupBy(
@@ -99,8 +120,42 @@ class OrderController extends Controller
                 'order_details.price',
                 'products.name'
             )
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $item->images = explode(',', $item->images);
+                return $item;
+            });
 
-        return view('orders.order_detail', compact('order', 'items'));
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'order' => $order,
+                'items' => $items
+            ]
+        ]);
+    }
+
+    // ===========================
+    // 4. API hủy đơn hàng
+    // ===========================
+    public function cancelOrder($id)
+    {
+        $order = DB::table('orders')->where('id', $id)->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng'
+            ], 404);
+        }
+
+        DB::table('orders')
+            ->where('id', $id)
+            ->update(['status' => 5]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Hủy đơn hàng thành công'
+        ]);
     }
 }

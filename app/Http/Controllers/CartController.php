@@ -7,54 +7,104 @@ use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-    public function index()
+    public function getCart(Request $request)
     {
-        $cart = session('cart', []);
-        return view('cart.index', compact('cart'));
+        $userId = $request->user_id;
+
+        $cart = DB::table('cart_items')
+            ->join('products', 'cart_items.product_id', '=', 'products.id')
+            ->leftJoin('product_image', 'products.id', '=', 'product_image.product_id')
+            ->select(
+                'cart_items.id',
+                'products.id as product_id',
+                'products.name',
+                'products.price',
+                'cart_items.quantity',
+                'product_image.url as image'
+            )
+            ->where('cart_items.user_id', $userId)
+            ->groupBy(
+                'cart_items.id',
+                'products.id',
+                'products.name',
+                'products.price',
+                'cart_items.quantity',
+                'product_image.url'
+            )
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'cart' => $cart
+        ]);
     }
+
     public function add(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity', 1);
-        $product = DB::table('products')->where('id', $productId)->first();
-        if (!$product) return back()->with('error', 'sản phẩm không tồn tại');
-        $cart = session('cart', []);
+        $userId = $request->user_id;
+        $productId = $request->product_id;
+        $quantity = $request->quantity ?? 1;
 
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] += $quantity;
+        $exists = DB::table('cart_items')
+            ->where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->first();
+
+        if ($exists) {
+            DB::table('cart_items')
+                ->where('id', $exists->id)
+                ->update([
+                    'quantity' => $exists->quantity + $quantity
+                ]);
         } else {
-            $cart[$productId] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => $quantity,
-                'image' => DB::table('productimage')->where('product_id', $productId)->value('url')
-            ];
+            DB::table('cart_items')->insert([
+                'user_id' => $userId,
+                'product_id' => $productId,
+                'quantity' => $quantity
+            ]);
         }
-        session(['cart' => $cart]);
-        return back()->with('success', 'Đã thêm sản phẩm vào giỏ hàng');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã thêm sản phẩm vào giỏ hàng'
+        ]);
     }
+
     public function update(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = max(1, $request->input('quantity', 1));
-        $cart = session('cart', []);
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] = $quantity;
-            session(['cart' => $cart]);
-        }
-        return back()->with('success', 'Cập nhật số lượng thành công!');
+        DB::table('cart_items')
+            ->where('id', $request->cart_id)
+            ->update([
+                'quantity' => $request->quantity
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật thành công'
+        ]);
     }
+
     public function remove(Request $request)
     {
-        $productId = $request->input('product_id');
-        $cart = session('cart', []);
+        DB::table('cart_items')
+            ->where('id', $request->cart_id)
+            ->delete();
 
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
-            session(['cart' => $cart]);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xóa sản phẩm khỏi giỏ hàng'
+        ]);
+    }
 
-        return back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+    public function clear(Request $request)
+    {
+        DB::table('cart_items')
+            ->where('user_id', $request->user_id)
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xóa toàn bộ giỏ hàng'
+        ]);
     }
 }
