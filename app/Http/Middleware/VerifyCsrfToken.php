@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
+<<<<<<< HEAD
         'login',
     'register',
     'cart/*',
@@ -20,5 +21,8 @@ class VerifyCsrfToken extends Middleware
     'cart/add',
     'cart/update',
     'cart/remove',
+=======
+        'admin/*',
+>>>>>>> 1e8a500c1c4cfc926ff7ea9d7a119c317d93851f
     ];
 }

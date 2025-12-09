@@ -1,8 +1,15 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\FavouriteController;
+use App\Http\Controllers\UserBrandController;
+use App\Http\Controllers\UserCategoryController;
+use App\Http\Controllers\UserProductController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
 
 
 /*
@@ -16,3 +23,65 @@ use Illuminate\Http\Request;
 |
 */
 
+<<<<<<< HEAD
+=======
+Route::prefix('api')->group(function () {
+    // Lấy dữ liệu cho trang chủ
+    Route::get('/home/hotProducts', [UserProductController::class, 'getHotProducts']);
+    Route::get('/home/brands', [UserProductController::class, 'getBrands']);
+    Route::get('/home/makeupProducts', [UserProductController::class, 'getMakeupProducts']);
+    Route::get('/home/lipstickProducts', [UserProductController::class, 'getLipstickProducts']);
+    Route::get('/home/skincareProducts', [UserProductController::class, 'getSkincareProducts']);
+    Route::get('/products/{id}', [UserProductController::class, 'getProductDetail']);
+
+    Route::get('/products', [UserProductController::class, 'index']);
+    Route::get('/categories', [UserCategoryController::class, 'index']);
+    Route::get('/brands', [UserBrandController::class, 'index']);
+
+    Route::get('products/favourites', [FavouriteController::class, 'index']);
+});
+
+// --- ROUTES DÀNH CHO KHU VỰC ADMIN ---
+Route::prefix('admin')->group(function () {
+    // 1. Quản lý Thương hiệu
+    Route::get('/brands', [BrandController::class, 'index']);
+    Route::post('/brands', [BrandController::class, 'store']);
+    Route::get('/brands/{id}', [BrandController::class, 'edit']);
+    Route::put('/brands/{id}', [BrandController::class, 'update']);
+    Route::delete('/brands/{id}', [BrandController::class, 'destroy']);
+
+    // 2. Quản lý Sản phẩm
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::post('/products/{id}/images', [ProductController::class, 'uploadImages']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
+    // 3. Quản lý Loại sản phẩm
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+    // 4. Quản lý Đơn hàng
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::put('/orders/{id}', [OrderController::class, 'update']);
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+
+    // 5. Quản lý Người dùng
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+});
+
+require __DIR__ . '/auth.php';
+require __DIR__ . '/cart.php';
+require __DIR__ . '/order.php';
+>>>>>>> 1e8a500c1c4cfc926ff7ea9d7a119c317d93851f
