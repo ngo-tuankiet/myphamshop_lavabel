@@ -8,34 +8,78 @@ use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
     public function getCart(Request $request)
+
     {
+
         $userId = $request->user_id;
 
         $cart = DB::table('cart_items')
+
             ->join('products', 'cart_items.product_id', '=', 'products.id')
-            ->leftJoin('product_image', 'products.id', '=', 'product_image.product_id')
+
+            ->leftJoin('productimage', 'products.id', '=', 'productimage.product_id')
+
             ->select(
+
                 'cart_items.id',
+
                 'products.id as product_id',
+
                 'products.name',
+
                 'products.price',
+
                 'cart_items.quantity',
-                'product_image.url as image'
+
+                'productimage.url as image'
+
             )
+
             ->where('cart_items.user_id', $userId)
+
             ->groupBy(
+
                 'cart_items.id',
+
                 'products.id',
+
                 'products.name',
+
                 'products.price',
+
                 'cart_items.quantity',
-                'product_image.url'
+
+                'productimage.url'
+
             )
+
             ->get();
+        $cart->transform(function ($item) {
+
+            if ($item->image) {
+                // loại dấu / ở đầu nếu có
+                $cleanPath = ltrim($item->image, '/');
+
+                // chuẩn URL: http://127.0.0.1:8000/storage/product_images/xxx.jpg
+                $item->image = url('storage/' . $cleanPath);
+            } else {
+                $item->image = url('storage/default.webp');
+            }
+
+            // Format giá
+            $item->formatted_price = number_format($item->price, 0, ',', '.') . 'đ';
+
+            return $item;
+        });
+
+
 
         return response()->json([
+
             'success' => true,
+
             'cart' => $cart
+
         ]);
     }
 

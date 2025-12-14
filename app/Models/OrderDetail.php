@@ -21,17 +21,11 @@ class OrderDetail extends Model
         'price', 
     ];
 
-    /**
-     * Quan hệ: Mặt hàng thuộc về Đơn hàng.
-     */
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
 
-    /**
-     * Quan hệ: Mặt hàng liên kết với Sản phẩm.
-     */
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');

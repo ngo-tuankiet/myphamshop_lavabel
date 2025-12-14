@@ -18,7 +18,6 @@ class Brand extends Model
         'brand_name',
     ];
 
-    // Cấu hình quan hệ với Product (một thương hiệu có nhiều sản phẩm)
     public function products()
     {
         return $this->hasMany(Product::class, 'brand_id', 'id');

@@ -11,10 +11,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-<<<<<<< HEAD
-    // ======================
-    // 1. API ĐĂNG KÝ
-    // ======================
     public function register(Request $request)
     {
         $request->validate([
@@ -32,32 +28,10 @@ class AuthController extends Controller
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
             'token'     => $token,
-=======
-    public function showRegisterForm()
-    {
-        return view('auth.register');
-
-    }
-    public function register(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|max:50|',
-            'fullname' => 'required|string|max:150|',
-            'email' => 'required|email|unique:pending_registrations|unique:users',
-            'password' => 'required|min:1|confirmed',
-        ]);
-        $token = Str::random(64);
-        \DB::table('pending_registrations')->insert([
-            'username' => $request->username,
-            'fullname' => $request->fullname,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'token' => $token,
->>>>>>> 1e8a500c1c4cfc926ff7ea9d7a119c317d93851f
             'created_at' => now(),
         ]);
-<<<<<<< HEAD
 
+        // Gửi email xác minh
         $verifyUrl = url('api/verify-email/' . $token);
 
         Mail::send('emails.verify', ['url' => $verifyUrl], function ($msg) use ($request) {
@@ -69,46 +43,8 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Vui lòng kiểm tra email để xác minh tài khoản!'
         ]);
-=======
-        $verifyUrl = url('/verify-email/' . $token);
-        Mail::send('emails.verify', ['url' => $verifyUrl], function ($msg) use ($request) {
-            $msg->to($request->email);
-            $msg->subject('Xác minh tài khoản MyPhamShop');
-        });
-
-        return back()->with('message', 'Vui lòng kiểm tra email của bạn để xác minh tài khoản.');
-
-    }
-    public function showLoginForm()
-    {
-        return view('auth.login');
-    }
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:1',
-        ]);
-        $user = User::where('email', $request->email)->first();
-        if (!$user)
-            return back()->withErrors(['email' => 'Email không tồn tại trong hệ thống']);
-        if (is_null($user->email_verified_at))
-            return back()->withErrors(['email' => 'Tài khoản chưa xác minh Gmail. Vui lòng kiểm tra email']);
-        if (!Hash::check($request->password, $user->password))
-            return back()->withErrors(['password' => 'Mật khẩu không chính xác'])->withInput();
-
-        Auth::login($user);
-        $request->session()->regenerate();
-        return redirect('/')->with('success', 'Đăng nhập thành công!');
-
-
-
->>>>>>> 1e8a500c1c4cfc926ff7ea9d7a119c317d93851f
     }
 
-    // ======================
-    // 2. API XÁC MINH EMAIL
-    // ======================
     public function verifyEmail($token)
     {
         $pending = DB::table('pending_registrations')->where('token', $token)->first();
@@ -117,7 +53,6 @@ class AuthController extends Controller
             return "Token không hợp lệ hoặc đã hết hạn.";
         }
 
-        // Tạo user vào bảng users
         User::create([
             'username' => $pending->username,
             'fullname' => $pending->fullname,
@@ -131,9 +66,6 @@ class AuthController extends Controller
         return "Xác minh thành công! Bạn có thể đăng nhập.";
     }
 
-    // ======================
-    // 3. API LOGIN
-    // ======================
     public function login(Request $request)
     {
         $request->validate([
@@ -161,6 +93,7 @@ class AuthController extends Controller
             'data' => $user
         ]);
     }
+
     public function changePassword(Request $request)
     {
         $request->validate([
@@ -169,7 +102,6 @@ class AuthController extends Controller
             'new_password' => 'required|string|min:6',
         ]);
 
-        // Lấy user
         $user = User::find($request->user_id);
 
         if (!$user) {
@@ -179,7 +111,6 @@ class AuthController extends Controller
             ], 404);
         }
 
-        // Kiểm tra mật khẩu cũ có đúng không
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'success' => false,
@@ -187,7 +118,6 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // Cập nhật mật khẩu mới
         $user->password = Hash::make($request->new_password);
         $user->save();
 
@@ -196,9 +126,7 @@ class AuthController extends Controller
             'message' => 'Đổi mật khẩu thành công!'
         ]);
     }
-    // ======================
-    // 4. LOGOUT (FE tự xoá token/session)
-    // ======================
+
     public function logout()
     {
         return response()->json([

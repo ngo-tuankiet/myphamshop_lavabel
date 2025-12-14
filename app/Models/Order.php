@@ -29,17 +29,11 @@ class Order extends Model
         'note', 
     ];
 
-    /**
-     * Quan hệ: Đơn hàng thuộc về User (người đặt hàng).
-     */
     public function user()
     {
         return $this->belongsTo(User::class); 
     }
 
-    /**
-     * Quan hệ: Lấy các mặt hàng trong đơn hàng
-     */
     public function items()
     {
         return $this->hasMany(OrderDetail::class);

@@ -18,11 +18,6 @@ class Category extends Model
         'description',
     ];
 
-
-    /**
-     * Quan hệ 1:N (Một Danh mục có nhiều Sản phẩm)
-     * * Khóa ngoại trong bảng products là 'subcategory_id'
-     */
     public function products()
     {
         return $this->hasMany(Product::class, 'subcategory_id', 'id');

@@ -14,23 +14,16 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    /**
-     * Lấy danh sách Sản phẩm (GET /admin/products)
-     * Kèm theo Brand và Category
-     */
     public function index(Request $request)
     {
         $query = Product::with(['brand', 'category', 'images']);
 
-        // Lấy các tham số từ request
         $search = $request->query('search');
 
-        // Xử lý Lọc/Tìm kiếm
         if ($search) {
             $query->where('name', 'LIKE', "%{$search}%");
         }
 
-        // Sắp xếp và Phân trang
         $products = $query->orderBy('id', 'DESC')->paginate(10);
 
         return response()->json([
@@ -40,9 +33,6 @@ class ProductController extends Controller
         ], 200);
     }
 
-    /**
-     * Thêm Sản phẩm mới (POST /admin/products)
-     */
     public function store(Request $request)
     {
         // Validation
@@ -64,7 +54,6 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            // Tạo Sản phẩm
             $product = Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -82,14 +71,12 @@ class ProductController extends Controller
 
             DB::commit();
 
-            // Load lại các quan hệ
-            $product->load(relations: ['brand', 'category']);
+            $product->load(['brand', 'category']);
 
             return response()->json([
                 'message' => 'Thêm sản phẩm thành công.',
                 'data' => $product,
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('LỖI SERVER: Giao dịch bị Rollback. Chi tiết: ' . $e->getMessage());
@@ -100,14 +87,10 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Trả về chi tiết một Sản phẩm (GET /admin/products/{product})
-     */
     public function show($id)
     {
         $product = Product::findOrFail($id);
 
-        // Load các quan hệ cần thiết
         $product->load(['brand', 'category', 'images']);
 
         return response()->json([
@@ -116,20 +99,15 @@ class ProductController extends Controller
         ], 200);
     }
 
-    /**
-     * Cập nhật Sản phẩm (PUT/PATCH /admin/products/{id})
-     */
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
-        // Validation 
         $request->validate([
-            // Đảm bảo tên sản phẩm là duy nhất, ngoại trừ sản phẩm hiện tại
             'name' => [
-                'required', 
-                'string', 
-                'max:255', 
+                'required',
+                'string',
+                'max:255',
                 Rule::unique('products')->ignore($product->id),
             ],
             'description' => 'nullable|string',
@@ -145,7 +123,6 @@ class ProductController extends Controller
             'scent' => 'nullable|string|max:255',
         ]);
 
-        // Cập nhật thông tin Sản phẩm
         try {
             $product->update([
                 'name' => $request->name,
@@ -161,14 +138,14 @@ class ProductController extends Controller
                 'volume' => $request->volume,
                 'scent' => $request->scent,
             ]);
-            
-            $product->load(relations: ['brand', 'category', 'images']);
+
+            $product->load(['brand', 'category', 'images']);
+
 
             return response()->json([
                 'message' => 'Cập nhật thông tin sản phẩm thành công.',
                 'data' => $product,
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('LỖI SERVER: Cập nhật thông tin bị lỗi. Chi tiết: ' . $e->getMessage());
             return response()->json([
@@ -178,15 +155,10 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Cập nhật hình ảnh của Sản phẩm (thay thế tất cả ảnh cũ bằng ảnh mới).
-     * Yêu cầu từ frontend: POST tới /admin/products/{id}/images
-     */
     public function uploadImages(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
-        // Validation 
         $request->validate([
             'images' => 'required|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -195,7 +167,6 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            // XÓA ẢNH CŨ 
             $oldImages = $product->images;
             foreach ($oldImages as $image) {
                 if (Storage::disk('public')->exists($image->url)) {
@@ -204,7 +175,6 @@ class ProductController extends Controller
                 $image->delete();
             }
 
-            // THÊM ẢNH MỚI
             $uploadedFiles = Arr::wrap($request->file('images'));
             foreach ($uploadedFiles as $file) {
                 $filePath = $file->store('product_images', 'public');
@@ -217,14 +187,12 @@ class ProductController extends Controller
 
             DB::commit();
 
-            // Trả về Response
-            $product->load(relations: ['images']);
+            $product->load(['images']);
 
             return response()->json([
                 'message' => 'Cập nhật hình ảnh sản phẩm thành công.',
                 'data' => $product->images,
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('LỖI SERVER: Giao dịch Update Image bị Rollback. Chi tiết: ' . $e->getMessage());
@@ -235,26 +203,19 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Xóa Sản phẩm (DELETE /admin/products/{id})
-     */
     public function destroy($id)
     {
-        // Tìm Sản phẩm
         $product = Product::findOrFail($id);
 
         DB::beginTransaction();
 
         try {
-            // Xóa tất cả ảnh liên quan           
             $product->images->each(function ($image) {
                 Storage::disk('public')->delete($image->url);
             });
 
-            // Xóa bản ghi trong database
             $product->images()->delete();
 
-            // 3. Xóa sản phẩm
             $product->delete();
 
             DB::commit();
@@ -262,7 +223,6 @@ class ProductController extends Controller
             return response()->json([
                 'message' => 'Xóa sản phẩm thành công.',
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

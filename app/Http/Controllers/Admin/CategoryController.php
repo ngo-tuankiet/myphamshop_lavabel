@@ -10,10 +10,6 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
-    /**
-     * GET /admin/categories
-     * Lấy danh sách tất cả các Category.
-     */
     public function index()
     {
         $categories = Category::all();
@@ -24,15 +20,11 @@ class CategoryController extends Controller
         ], 200);
     }
 
-    /**
-     * POST /admin/categories
-     * Thêm Category mới.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
-            'description' => 'nullable|string', 
+            'description' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -49,7 +41,6 @@ class CategoryController extends Controller
                 'message' => 'Thêm loại sản phẩm thành công.',
                 'data' => $category,
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -59,25 +50,16 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * GET /admin/categories/{id}
-     * Lấy chi tiết một Category
-     */
     public function show($id)
     {
-        // Tìm Category và tải Sản phẩm liên quan
         $category = Category::with('products')->findOrFail($id);
-        
+
         return response()->json([
             'message' => 'Lấy chi tiết loại sản phẩm thành công.',
             'data' => $category,
         ], 200);
     }
 
-    /**
-     * PUT/PATCH /admin/categories/{id}
-     * Cập nhật Category.
-     */
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
@@ -89,7 +71,7 @@ class CategoryController extends Controller
                 'max:255',
                 Rule::unique('categories', 'name')->ignore($category->id),
             ],
-            'description' => 'nullable|string', 
+            'description' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -105,7 +87,6 @@ class CategoryController extends Controller
             return response()->json([
                 'message' => 'Cập nhật loại sản phẩm thành công.',
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -115,10 +96,6 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * DELETE /admin/categories/{id}
-     * Xóa Category.
-     */
     public function destroy($id)
     {
         $category = Category::findOrFail($id);
@@ -126,9 +103,8 @@ class CategoryController extends Controller
         DB::beginTransaction();
 
         try {
-            // Kiểm tra ràng buộc: Nếu có Sản phẩm liên quan, không cho phép xóa
             if ($category->products()->exists()) {
-                 return response()->json([
+                return response()->json([
                     'error' => 'Không thể xóa loại sản phẩm này vì có sản phẩm liên quan. Vui lòng chuyển sản phẩm sang loại khác trước.'
                 ], 409);
             }
@@ -141,7 +117,6 @@ class CategoryController extends Controller
             return response()->json([
                 'message' => 'Xóa loại sản phẩm thành công.',
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
