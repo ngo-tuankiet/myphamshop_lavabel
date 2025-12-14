@@ -1,0 +1,26 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@ant-design-vue/nuxt": "^1.4.5",
+    "@ant-design/icons-vue": "^6.0.0",
+    "@firebase/storage": "^0.13.3",
+    "@nuxtjs-alt/axios": "^1.1.0",
+    "@nuxtjs/axios": "^5.13.6",
+    "ant-design-vue": "^4.2.5",
+    "axios": "^1.7.7",
+    "firebase": "^11.0.1",
+    "firebase-admin": "^12.7.0",
+    "nuxt": "^3.13.2",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  }
+}
