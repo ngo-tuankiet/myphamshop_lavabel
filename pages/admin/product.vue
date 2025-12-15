@@ -198,7 +198,7 @@ const rules = {
 
 // LOAD DATA
 const loadProducts = async () => {
-  const json = await apiFetch('/products')
+  const json = await apiFetch('/api/products')
   products.value = (json.data?.data || []).map(p => ({
     ...p,
     images: p.images.map(i => i.url)
@@ -206,12 +206,12 @@ const loadProducts = async () => {
 }
 
 const loadBrands = async () => {
-  const json = await apiFetch('/brands')
+  const json = await apiFetch('/api/brands')
   brands.value = json.data?.data || []
 }
 
 const loadCategories = async () => {
-  const json = await apiFetch('/categories')
+  const json = await apiFetch('/api/categories')
   categories.value = json.data || []
 }
 
@@ -264,10 +264,10 @@ const submitForm = async () => {
     const fd = new FormData()
     for (let k in form) fd.append(k, form[k] ?? "")
 
-    let url = '/products'
+    let url = '/api/products'
     if (editingId.value) {
       fd.append("_method", "PUT")
-      url = `/products/${editingId.value}`
+      url = `/api/products/${editingId.value}`
     }
 
     const json = await apiFetch(url, { method: "POST", body: fd })
@@ -293,7 +293,7 @@ const submitForm = async () => {
 // DELETE PRODUCT
 const deleteProduct = async (id) => {
   try {
-    const json = await apiFetch(`/products/${id}`, { method: "DELETE" })
+    const json = await apiFetch(`/api/products/${id}`, { method: "DELETE" })
     message.success(json.message)
     loadProducts()
   } catch (err) {
