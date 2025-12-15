@@ -278,7 +278,7 @@ const detailColumns = [
 const fetchOrders = async () => {
   loading.value = true
   try {
-    const res = await fetch(`${apiBase}/api/orders?status=${activeTab.value}`)
+    const res = await fetch(`${apiBase}/api/admin/orders?status=${activeTab.value}`)
     const json = await res.json()
     if (res.ok) {
       orders.value = json.data?.data || json.data || []
@@ -296,7 +296,7 @@ const fetchOrders = async () => {
 // Chi tiết đơn
 const showOrderDetail = async (orderId) => {
   try {
-    const res = await fetch(`${apiBase}/api/orders/${orderId}`)
+    const res = await fetch(`${apiBase}/api/admin/orders/${orderId}`)
     const json = await res.json()
     if (res.ok) {
       orderDetail.value = json.data
@@ -319,7 +319,7 @@ const showModalDone = (id) => { idDone.value = id; modalVisibleDone.value = true
 // Update trạng thái
 const updateOrderStatus = async (id, status, successMsg, errorMsg) => {
   try {
-    const res = await fetch(`${apiBase}/api/orders/${id}`, {
+    const res = await fetch(`${apiBase}/api/admin/orders/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ status }),

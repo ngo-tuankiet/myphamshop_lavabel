@@ -80,7 +80,7 @@ definePageMeta({ layout: 'admin', keepalive: false })
 
 // === RUNTIME CONFIG ===
 const config = useRuntimeConfig()
-const API_BASE = config.public.API_BASE + '/api/users'
+const API_BASE = config.public.API_BASE + '/api/admin/users'
 
 // ===== HELPER =====
 const apiFetch = async (path = '', options = {}) => {
