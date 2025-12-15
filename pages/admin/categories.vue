@@ -67,6 +67,8 @@ definePageMeta({
     keepalive: false,
 })
 
+const { public: { apiBase } } = useRuntimeConfig();
+
 // ==================== STATE ====================
 const categories = ref([])
 const visible = ref(false)
@@ -121,8 +123,8 @@ const handleOk = () => {
         confirmLoading.value = true
 
         const url = currentId.value
-            ? `http://127.0.0.1:8000/api/categories/${currentId.value}`
-            : "http://127.0.0.1:8000/api/categories"
+            ? `${apiBase}/categories/${currentId.value}`
+            : `${apiBase}/categories`
 
         const method = currentId.value ? "PUT" : "POST"
 
@@ -165,7 +167,7 @@ const handleEdit = (record) => {
 
 // Delete
 const handleDelete = async (id) => {
-    const res = await fetch(`http://127.0.0.1:8000/api/categories/${id}`, {
+    const res = await fetch(`${apiBase}/categories/${id}`, {
         method: "DELETE",
     })
 
@@ -179,7 +181,7 @@ const handleDelete = async (id) => {
 
 // Get list categories
 const fetchCategories = async () => {
-    const res = await fetch("http://127.0.0.1:8000/api/categories", { signal })
+    const res = await fetch(`${apiBase}/categories`, { signal })
     const json = await res.json()
     categories.value = json.data
 }
@@ -193,6 +195,7 @@ onBeforeUnmount(() => {
     controller.abort()
 })
 </script>
+
 
 
 <style scoped></style>

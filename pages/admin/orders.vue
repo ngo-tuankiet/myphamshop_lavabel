@@ -231,7 +231,7 @@ definePageMeta({
   keepalive: false,
 })
 
-const API_BASE = 'http://127.0.0.1:8000/api/admin'
+const { public: { apiBase } } = useRuntimeConfig();
 
 const activeTab = ref('1')
 const orders = ref([])
@@ -255,101 +255,33 @@ const idDone = ref(null)
 
 // Cột bảng danh sách đơn hàng
 const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: 'Mã đơn',
-    dataIndex: 'code',
-    key: 'code',
-  },
-  {
-    title: 'Ngày đặt',
-    dataIndex: 'created_at',
-    key: 'created_at',
-    slots: { customRender: 'created_at' },
-  },
-  {
-    title: 'Khách hàng',
-    dataIndex: 'customer_name',
-    key: 'customer_name',
-  },
-  {
-    title: 'SĐT',
-    dataIndex: 'customer_phone',
-    key: 'customer_phone',
-  },
-  {
-    title: 'Tổng tiền',
-    dataIndex: 'total_amount',
-    key: 'total_amount',
-    slots: { customRender: 'total_amount' },
-  },
-  {
-    title: 'Trạng thái',
-    dataIndex: 'status',
-    key: 'status',
-    slots: { customRender: 'status' },
-  },
-  {
-    title: 'Thao tác',
-    key: 'action',
-    fixed: 'right',
-    width: 200,
-    slots: { customRender: 'action' },
-  },
+  { title: 'ID', dataIndex: 'id', key: 'id' },
+  { title: 'Mã đơn', dataIndex: 'code', key: 'code' },
+  { title: 'Ngày đặt', dataIndex: 'created_at', key: 'created_at', slots: { customRender: 'created_at' } },
+  { title: 'Khách hàng', dataIndex: 'customer_name', key: 'customer_name' },
+  { title: 'SĐT', dataIndex: 'customer_phone', key: 'customer_phone' },
+  { title: 'Tổng tiền', dataIndex: 'total_amount', key: 'total_amount', slots: { customRender: 'total_amount' } },
+  { title: 'Trạng thái', dataIndex: 'status', key: 'status', slots: { customRender: 'status' } },
+  { title: 'Thao tác', key: 'action', fixed: 'right', width: 200, slots: { customRender: 'action' } },
 ]
 
 // Cột chi tiết sản phẩm trong đơn
 const detailColumns = [
-  {
-    title: 'Hình ảnh',
-    key: 'image',
-    dataIndex: 'product',
-    width: 80,
-    slots: { customRender: 'image' },
-  },
-  {
-    title: 'Tên sản phẩm',
-    key: 'product_name',
-    dataIndex: 'product',
-    slots: { customRender: 'product_name' },
-  },
-  {
-    title: 'Số lượng',
-    dataIndex: 'quantity',
-    key: 'quantity',
-    width: 100,
-  },
-  {
-    title: 'Đơn giá',
-    dataIndex: 'price',
-    key: 'price',
-    width: 150,
-    slots: { customRender: 'price' },
-  },
-  {
-    title: 'Thành tiền',
-    key: 'totalPrice',
-    width: 150,
-    slots: { customRender: 'totalPrice' },
-  },
+  { title: 'Hình ảnh', key: 'image', dataIndex: 'product', width: 80, slots: { customRender: 'image' } },
+  { title: 'Tên sản phẩm', key: 'product_name', dataIndex: 'product', slots: { customRender: 'product_name' } },
+  { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', width: 100 },
+  { title: 'Đơn giá', dataIndex: 'price', key: 'price', width: 150, slots: { customRender: 'price' } },
+  { title: 'Thành tiền', key: 'totalPrice', width: 150, slots: { customRender: 'totalPrice' } },
 ]
 
 // Lấy danh sách đơn hàng
 const fetchOrders = async () => {
   loading.value = true
   try {
-    const status = activeTab.value // 1..5
-    const res = await fetch(`${API_BASE}/orders?status=${status}`)
+    const res = await fetch(`${apiBase}/orders?status=${activeTab.value}`)
     const json = await res.json()
-
-    // json.data là paginator, json.data.data mới là mảng đơn hàng
     if (res.ok) {
-      const list = json.data?.data || json.data || []
-      orders.value = list
+      orders.value = json.data?.data || json.data || []
     } else {
       message.error(json.message || 'Lỗi khi tải danh sách đơn hàng')
     }
@@ -364,9 +296,8 @@ const fetchOrders = async () => {
 // Chi tiết đơn
 const showOrderDetail = async (orderId) => {
   try {
-    const res = await fetch(`${API_BASE}/orders/${orderId}`)
+    const res = await fetch(`${apiBase}/orders/${orderId}`)
     const json = await res.json()
-
     if (res.ok) {
       orderDetail.value = json.data
       modalVisible.value = true
@@ -379,98 +310,35 @@ const showOrderDetail = async (orderId) => {
   }
 }
 
-// Mở các modal
-const showModalCancel = (id) => {
-  idCancel.value = id
-  modalVisibleCancel.value = true
-}
+// Modal
+const showModalCancel = (id) => { idCancel.value = id; modalVisibleCancel.value = true }
+const showModalConfirm = (id) => { idConfirm.value = id; modalVisibleConfirm.value = true }
+const showModalDelivery = (id) => { idDelivery.value = id; modalVisibleDelivery.value = true }
+const showModalDone = (id) => { idDone.value = id; modalVisibleDone.value = true }
 
-const showModalConfirm = (id) => {
-  idConfirm.value = id
-  modalVisibleConfirm.value = true
-}
-
-const showModalDelivery = (id) => {
-  idDelivery.value = id
-  modalVisibleDelivery.value = true
-}
-
-const showModalDone = (id) => {
-  idDone.value = id
-  modalVisibleDone.value = true
-}
-
-// Hàm gọi API update status
+// Update trạng thái
 const updateOrderStatus = async (id, status, successMsg, errorMsg) => {
   try {
-    const res = await fetch(`${API_BASE}/orders/${id}`, {
+    const res = await fetch(`${apiBase}/orders/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ status }),
     })
     const json = await res.json()
-
-    if (res.ok) {
-      message.success(successMsg)
-      await fetchOrders()
-      handleCancel()
-    } else {
-      message.error(json.error || errorMsg)
-    }
+    if (res.ok) { message.success(successMsg); await fetchOrders(); handleCancel() }
+    else message.error(json.error || errorMsg)
   } catch (err) {
     console.error(err)
     message.error(errorMsg)
   }
 }
 
-// Hủy đơn
-const cancelOrder = () => {
-  if (!idCancel.value) return
-  updateOrderStatus(
-    idCancel.value,
-    5,
-    'Hủy đơn hàng thành công',
-    'Có lỗi xảy ra khi hủy đơn hàng',
-  )
-}
+const cancelOrder = () => idCancel.value && updateOrderStatus(idCancel.value, 5, 'Hủy đơn hàng thành công', 'Có lỗi xảy ra khi hủy đơn hàng')
+const confirmOrder = () => idConfirm.value && updateOrderStatus(idConfirm.value, 2, 'Xác nhận đơn hàng thành công', 'Có lỗi xảy ra khi xác nhận đơn hàng')
+const deliveryOrder = () => idDelivery.value && updateOrderStatus(idDelivery.value, 3, 'Đơn hàng đã bàn giao cho đơn vị vận chuyển', 'Có lỗi xảy ra khi bàn giao đơn vị vận chuyển')
+const doneOrder = () => idDone.value && updateOrderStatus(idDone.value, 4, 'Đơn hàng đã được giao thành công', 'Có lỗi xảy ra khi cập nhật trạng thái hoàn thành')
 
-// Nhận đơn
-const confirmOrder = () => {
-  if (!idConfirm.value) return
-  updateOrderStatus(
-    idConfirm.value,
-    2,
-    'Xác nhận đơn hàng thành công',
-    'Có lỗi xảy ra khi xác nhận đơn hàng',
-  )
-}
-
-// Bàn giao vận chuyển
-const deliveryOrder = () => {
-  if (!idDelivery.value) return
-  updateOrderStatus(
-    idDelivery.value,
-    3,
-    'Đơn hàng đã bàn giao cho đơn vị vận chuyển',
-    'Có lỗi xảy ra khi bàn giao đơn vị vận chuyển',
-  )
-}
-
-// Đánh dấu đã giao xong
-const doneOrder = () => {
-  if (!idDone.value) return
-  updateOrderStatus(
-    idDone.value,
-    4,
-    'Đơn hàng đã được giao thành công',
-    'Có lỗi xảy ra khi cập nhật trạng thái hoàn thành',
-  )
-}
-
-// Đóng tất cả modal
+// Đóng modal
 const handleCancel = () => {
   modalVisible.value = false
   modalVisibleCancel.value = false
@@ -480,50 +348,15 @@ const handleCancel = () => {
   orderDetail.value = null
 }
 
-// Format helpers
-const formatDate = (date) => {
-  return new Date(date).toLocaleString('vi-VN')
-}
+// Helpers
+const formatDate = (date) => new Date(date).toLocaleString('vi-VN')
+const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
+const getFormatStatus = (status) => ({1:'Chờ xác nhận',2:'Đã xác nhận',3:'Đang giao hàng',4:'Đã nhận hàng',5:'Đã hủy đơn'}[status] || 'Không xác định')
+const getStatusColor = (status) => ({1:'orange',2:'blue',3:'cyan',4:'green',5:'red'}[status] || 'default')
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(price || 0)
-}
-
-const getFormatStatus = (status) => {
-  switch (status) {
-    case 1:
-      return 'Chờ xác nhận'
-    case 2:
-      return 'Đã xác nhận'
-    case 3:
-      return 'Đang giao hàng'
-    case 4:
-      return 'Đã nhận hàng'
-    case 5:
-      return 'Đã hủy đơn'
-    default:
-      return 'Không xác định'
-  }
-}
-
-const getStatusColor = (status) => {
-  const map = {
-    1: 'orange',
-    2: 'blue',
-    3: 'cyan',
-    4: 'green',
-    5: 'red',
-  }
-  return map[status] || 'default'
-}
-
-onMounted(() => {
-  fetchOrders()
-})
+onMounted(() => { fetchOrders() })
 </script>
+
 
 <style scoped>
 .ant-table-wrapper {

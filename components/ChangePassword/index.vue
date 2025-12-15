@@ -1,71 +1,167 @@
-<template>
-    <div>
-        <a-card class="w-full max-w-md">
-            <a-card-header>
-                <a-card-title>Change Password</a-card-title>
-            </a-card-header>
+<script>
+import { HeartFilled } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 
-            <a-card-content>
-                <div class="space-y-4">
+export default {
+    components: { HeartFilled },
 
-                    <a-label>Mật khẩu cũ</a-label>
-                    <a-input type="password" v-model:value="oldPassword" />
+    data() {
+        return {
+            apiBase: "",
 
-                    <a-label>Mật khẩu mới</a-label>
-                    <a-input type="password" v-model:value="newPassword" />
+            images: [
+                "https://file.hstatic.net/1000391653/file/slider-ct-28---31__1__master.jpg",
+                "https://file.hstatic.net/1000391653/file/crazynight-new_1_master.jpg",
+                "https://file.hstatic.net/1000391653/file/dbt-new_1_master.jpg",
+            ],
+            currentIndex: 0,
 
-                    <a-label>Xác nhận mật khẩu</a-label>
-                    <a-input type="password" v-model:value="confirmPassword" />
+            products: [],
+            selectedProduct: {},
+            isModalVisible: false,
+            quantity: 1,
+            likedProducts: []
+        };
+    },
 
-                    <a-button type="primary" @click="handlePasswordChange">
-                        Update Password
-                    </a-button>
-                </div>
-            </a-card-content>
-        </a-card>
-    </div>
-</template>
+    mounted() {
+        // ✅ runtime config CHỈ lấy ở client
+        const config = useRuntimeConfig();
+        this.apiBase = config.public.apiBase;
 
-<script setup>
-import { ref } from "vue"
-import { message } from "ant-design-vue"
+        this.startSlideShow();
+        this.fetchProducts();
 
-const oldPassword = ref("")
-const newPassword = ref("")
-const confirmPassword = ref("")
-
-const handlePasswordChange = async () => {
-    const user = JSON.parse(sessionStorage.getItem("user") || "null")
-
-    if (!user) {
-        return message.error("Bạn chưa đăng nhập")
-    }
-
-    if (newPassword.value !== confirmPassword.value) {
-        return message.error("Mật khẩu xác nhận không khớp")
-    }
-
-    try {
-        const res = await $fetch("http://127.0.0.1:8000/api/change-password", {
-            method: "POST",
-            body: {
-                user_id: user.id,
-                old_password: oldPassword.value,
-                new_password: newPassword.value
-            }
-        })
-
-        if (res.success) {
-            message.success("Đổi mật khẩu thành công")
-            oldPassword.value = ""
-            newPassword.value = ""
-            confirmPassword.value = ""
-        } else {
-            message.error(res.message || "Đổi mật khẩu thất bại")
+        if (process.client) {
+            this.loadFavouriteProducts();
         }
+    },
 
-    } catch (err) {
-        message.error("Lỗi server!")
+    methods: {
+        /* ================= SLIDER ================= */
+        startSlideShow() {
+            setInterval(() => {
+                this.currentIndex = (this.currentIndex + 1) % this.images.length;
+            }, 6000);
+        },
+
+        /* ================= PRODUCTS ================= */
+        async fetchProducts() {
+            try {
+                const res = await fetch(
+                    `${this.apiBase}/api/home/hotProducts`
+                );
+                const data = await res.json();
+                this.products = data.data ?? data;
+
+            } catch (err) {
+                console.error(err);
+                message.error("Không tải được sản phẩm!");
+            }
+        },
+
+        /* ================= FAVOURITES ================= */
+        async loadFavouriteProducts() {
+            let user = null;
+
+            if (process.client) {
+                user = JSON.parse(sessionStorage.getItem("user"));
+            }
+            if (!user) return;
+
+            try {
+                const res = await fetch(
+                    `${this.apiBase}/api/favourites?user_id=${user.id}`
+                );
+                const data = await res.json();
+                this.likedProducts = data.data.map(i => i.product_id);
+
+            } catch (error) {
+                console.error("Lỗi load favourites:", error);
+            }
+        },
+
+        /* ================= MODAL ================= */
+        showModal(product) {
+            this.selectedProduct = product;
+            this.isModalVisible = true;
+        },
+
+        handleCancel() {
+            this.isModalVisible = false;
+            this.quantity = 1;
+        },
+
+        /* ================= CART ================= */
+        async addToCart() {
+            let user = null;
+
+            if (process.client) {
+                user = JSON.parse(sessionStorage.getItem("user"));
+            }
+            if (!user) return message.warning("Vui lòng đăng nhập");
+
+            try {
+                await fetch(`${this.apiBase}/api/cart/add`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        product_id: this.selectedProduct.id,
+                        quantity: this.quantity
+                    })
+                });
+
+                message.success("Đã thêm vào giỏ hàng!");
+                this.isModalVisible = false;
+                this.quantity = 1;
+
+            } catch (err) {
+                console.error(err);
+                message.error("Lỗi khi thêm giỏ hàng");
+            }
+        },
+
+        /* ================= LIKE ================= */
+        async toggleLike(productId) {
+            let user = null;
+
+            if (process.client) {
+                user = JSON.parse(sessionStorage.getItem("user"));
+            }
+            if (!user) return message.warning("Bạn cần đăng nhập");
+
+            const isLiked = this.likedProducts.includes(productId);
+            const url = isLiked
+                ? `${this.apiBase}/api/favourites/remove`
+                : `${this.apiBase}/api/favourites/add`;
+
+            try {
+                const res = await fetch(url, {
+                    method: isLiked ? "DELETE" : "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        product_id: productId
+                    })
+                });
+
+                if (res.ok) {
+                    this.likedProducts = isLiked
+                        ? this.likedProducts.filter(id => id !== productId)
+                        : [...this.likedProducts, productId];
+
+                    message.success(isLiked ? "Đã xóa yêu thích" : "Đã thêm yêu thích");
+                }
+
+            } catch (error) {
+                console.error("Like error:", error);
+                message.error("Không thể kết nối API yêu thích");
+            }
+        },
+
+        incrementQuantity() { this.quantity++; },
+        decrementQuantity() { if (this.quantity > 1) this.quantity--; },
     }
-}
+};
 </script>

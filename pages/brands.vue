@@ -1,11 +1,23 @@
 <template>
     <div class="brands-container p-6">
         <a-row :gutter="[16, 16]">
-            <a-col v-for="brand in brands" :key="brand.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
-                <a-card hoverable class="brand-card" @click="navigateToBrandProducts(brand.id)">
+            <a-col
+                v-for="brand in brands"
+                :key="brand.id"
+                :xs="24"
+                :sm="12"
+                :md="8"
+                :lg="6"
+                :xl="4"
+            >
+                <a-card
+                    hoverable
+                    class="brand-card"
+                    @click="navigateToBrandProducts(brand.id)"
+                >
                     <a-card-meta :title="brand.brand_name">
                         <template #description>
-                            <p>{{ brand.description || 'Không có mô tả' }}</p>
+                            <p>{{ brand.description || "Không có mô tả" }}</p>
                         </template>
                     </a-card-meta>
                 </a-card>
@@ -21,43 +33,42 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from "vue";
 
-const brands = ref([])
-const loading = ref(false)
-const error = ref(null)
+const config = useRuntimeConfig();
+const apiBase = config.public.apiBase;
+
+const brands = ref([]);
+const loading = ref(false);
+const error = ref(null);
 
 const fetchBrands = async () => {
     try {
-        loading.value = true
-        error.value = null
+        loading.value = true;
+        error.value = null;
 
-        // ⭐ GỌI API ĐÚNG THEO BE
-        const response = await fetch('http://127.0.0.1:8000/api/user/brands')
+        const response = await fetch(`${apiBase}/api/user/brands`);
+        if (!response.ok) throw new Error("Failed to fetch brands");
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch brands')
-        }
-
-        const res = await response.json()
-
-        // ⭐ BE trả về: { message: "...", data: { data: [ ... ] } }
-        brands.value = res.data.data  
+        const res = await response.json();
+        brands.value = res.data.data;
     } catch (err) {
-        error.value = err.message
-        console.error('Error fetching brands:', err)
+        error.value = err.message;
+        console.error(err);
     } finally {
-        loading.value = false
+        loading.value = false;
     }
-}
+};
 
 const navigateToBrandProducts = (brandId) => {
-    window.location.href = `/brandsnew/${brandId}`
-}
+    navigateTo(`/brandsnew/${brandId}`);
+};
 
 onMounted(() => {
-    fetchBrands()
-})
+    if (process.client) {
+        fetchBrands();
+    }
+});
 </script>
 
 <style scoped>

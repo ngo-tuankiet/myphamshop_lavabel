@@ -84,6 +84,9 @@ import { ref, computed, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 const router = useRouter()
 
+// lấy apiBase từ runtime config
+const { public: { apiBase } } = useRuntimeConfig()
+
 // giỏ hàng
 const cartItems = ref([])
 const submitting = ref(false)
@@ -138,7 +141,7 @@ const loadCart = async () => {
 
     const user = JSON.parse(userRaw);
 
-    const res = await $fetch("http://127.0.0.1:8000/api/cart/get", {
+    const res = await $fetch(`${apiBase}/api/cart/get`, {
         method: "POST",
         body: { user_id: user.id }
     }); 
@@ -152,7 +155,7 @@ const loadCart = async () => {
 };
 
 const updateQuantity = async (item, value) => {
-    await $fetch("http://127.0.0.1:8000/api/cart/update", {
+    await $fetch(`${apiBase}/api/cart/update`, {
         method: "POST",
         body: {
             cart_id: item.id,
@@ -166,7 +169,7 @@ const updateQuantity = async (item, value) => {
 
 // xóa item khỏi giỏ
 const removeFromCart = async (item) => {
-    await $fetch("http://127.0.0.1:8000/api/cart/remove", {
+    await $fetch(`${apiBase}/api/cart/remove`, {
         method: "POST",
         body: { cart_id: item.id }
     })
@@ -176,8 +179,6 @@ const removeFromCart = async (item) => {
 }
 
 // gửi đặt hàng
-
-    
 const handleSubmit = async (values) => {
     submitting.value = true;
 
@@ -193,7 +194,7 @@ const handleSubmit = async (values) => {
     };
 
     try {
-        const res = await $fetch("http://127.0.0.1:8000/api/orders/check", {
+        const res = await $fetch(`${apiBase}/api/orders/check`, {
             method: "POST",
             body: orderBody,
             headers: {
@@ -225,5 +226,5 @@ if  (process.client) loadCart();
         message.error("Thanh toán thất bại");
     }
 });
-
 </script>
+

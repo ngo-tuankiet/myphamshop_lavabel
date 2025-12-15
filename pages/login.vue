@@ -30,6 +30,8 @@ import { ref, onMounted } from "vue";
 import { message } from "ant-design-vue";
 const router = useRouter();
 
+const { public: { apiBase } } = useRuntimeConfig();
+
 const email = ref('');
 const password = ref('');
 
@@ -41,7 +43,7 @@ const onSubmit = async () => {
     }
 
     try {
-        const res = await $fetch('http://127.0.0.1:8000/api/login', {
+        const res = await $fetch(`${apiBase}/api/login`, {
             method: 'POST',
             body: {
                 email: email.value,
@@ -54,9 +56,8 @@ const onSubmit = async () => {
             return;
         }
 
-        const user = res.data;   // ✔ user thật từ API
+        const user = res.data;
 
-        // LƯU ĐÚNG USER
         sessionStorage.setItem("user", JSON.stringify(user));
 
         message.success("Đăng nhập thành công!");
@@ -75,7 +76,8 @@ onMounted(() => {
     const user = JSON.parse(sessionStorage.getItem("user") || 'null');
     if (user) router.push("/");
 });
-</script>type "d:\web\frontend\pages\login.vue"
+</script>
+
 
 <style scoped>
 .register-page {

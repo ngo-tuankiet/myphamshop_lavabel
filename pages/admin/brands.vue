@@ -78,8 +78,10 @@ import { message } from "ant-design-vue";
 
 definePageMeta({ layout: "admin" });
 
+const { public: { apiBase } } = useRuntimeConfig();
+
 // API
-const API = "http://127.0.0.1:8000/api/brands";
+const API = `${apiBase}/brands`;
 
 // STATE
 const brands = ref([]);
@@ -104,11 +106,10 @@ const columns = [
 // GET LOGO URL
 function getLogo(record) {
   if (record.logo?.url) {
-    return "http://localhost:8000/storage/" + record.logo.url;
+    return `${apiBase.replace('/api','')}/storage/${record.logo.url}`;
   }
   return "https://placehold.co/60x60?text=No+Logo";
 }
-
 
 // FETCH LIST
 async function fetchBrands() {
@@ -195,6 +196,7 @@ async function deleteBrand(id) {
 
 fetchBrands();
 </script>
+
 
 <style scoped>
 .mb-4 {

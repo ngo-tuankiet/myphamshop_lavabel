@@ -44,6 +44,8 @@ import { ref } from "vue";
 import { message } from "ant-design-vue";
 const router = useRouter();
 
+const { public: { apiBase } } = useRuntimeConfig();
+
 const username = ref('');
 const fullname = ref('');
 const email = ref('');
@@ -69,7 +71,7 @@ const onSubmit = async () => {
             password: password.value
         };
 
-        const res = await $fetch('http://127.0.0.1:8000/api/register', {
+        const res = await $fetch(`${apiBase}/api/register`, {
             method: 'POST',
             body: payload
         });
@@ -83,6 +85,7 @@ const onSubmit = async () => {
     }
 };
 </script>
+
 
 <style scoped>
 .register-page {
