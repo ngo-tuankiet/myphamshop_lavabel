@@ -51,14 +51,15 @@ import {
     ShoppingCartOutlined,
     DollarOutlined
 } from '@ant-design/icons-vue'
-import { Statistic } from 'ant-design-vue'
+import { useRuntimeConfig } from '#app'
 
-// Define the layout for the page
 definePageMeta({
     layout: 'admin'
 })
 
-// State for stats data
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase
+
 const stats = ref({
     totalOrders: 0,
     totalProducts: 0,
@@ -66,22 +67,20 @@ const stats = ref({
     totalUsers: 0
 })
 
-// Fetch stats data from the API
 const fetchDashboardStats = async () => {
     try {
-        const response = await $fetch('http://localhost:5000/api/order/dashboard')
+        const response = await $fetch(`${apiBase}/api/order/dashboard`)
         stats.value = response
-        console.log("Dashboard stats:", stats.value)
     } catch (error) {
         console.error('Error fetching dashboard stats:', error)
     }
 }
 
-// Fetch stats when component is mounted
 onMounted(() => {
     fetchDashboardStats()
 })
 </script>
+
 
 <style scoped>
 .sidebar {

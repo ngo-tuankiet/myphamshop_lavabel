@@ -18,9 +18,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
+import { useRuntimeConfig } from '#app'
+
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase
 
 const user = ref({
-    name: '',
+    fullname: '',
     email: '',
     phone: '',
     id: ''
@@ -30,7 +34,6 @@ onMounted(() => {
     const storedUser = sessionStorage.getItem("user")
     if (storedUser) {
         user.value = JSON.parse(storedUser)
-        console.log("hihi:", user.value)
     }
 })
 
@@ -40,8 +43,8 @@ const updateInfo = async () => {
             id: user.value.id,
             name: user.value.fullname,
         }
-        console.log("Hiii", payload)
-        const response = await fetch('http://localhost:5000/api/users/update', {
+
+        const response = await fetch(`${apiBase}/api/users/update`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -61,6 +64,7 @@ const updateInfo = async () => {
     }
 }
 </script>
+
 
 <style scoped>
 .user-details {

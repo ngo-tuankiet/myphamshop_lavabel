@@ -81,7 +81,7 @@ definePageMeta({ layout: "admin" });
 const { public: { apiBase } } = useRuntimeConfig();
 
 // API
-const API = `${apiBase}/brands`;
+const API = `${apiBase}/api/brands`;
 
 // STATE
 const brands = ref([]);

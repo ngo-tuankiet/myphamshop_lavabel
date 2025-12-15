@@ -89,6 +89,7 @@ import {
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import { message } from "ant-design-vue";
+import { useRuntimeConfig } from "#app";
 
 export default {
     name: "Header",
@@ -100,94 +101,70 @@ export default {
     },
 
     setup() {
+        const config = useRuntimeConfig();
+        const apiBase = config.public.apiBase;
+
         const categories = ref([]);
         const isLoading = ref(false);
         const selectedKeys = ref(["1"]);
         const isCheck = ref(false);
 
-        /* ======================= CHECK LOGIN ======================= */
         const checkLoginStatus = () => {
             isCheck.value = !!sessionStorage.getItem("user");
         };
 
-
-        /* ======================= LOAD CATEGORY MENU ======================= */
         const loadCategories = async () => {
             if (!isLoading.value && categories.value.length === 0) {
                 isLoading.value = true;
-
                 try {
-                    const res = await axios.get("http://localhost:8000/api/user/categories");
-                    categories.value = res.data.data; // BE return đúng dạng này
+                    const res = await axios.get(`${apiBase}/api/user/categories`);
+                    categories.value = res.data.data;
                 } catch (error) {
-                    console.error("Error loading categories:", error);
+                    console.error(error);
                 } finally {
                     isLoading.value = false;
                 }
             }
         };
 
-
-        /* ======================= MENU ACTIVE ======================= */
         const updateSelectedKey = () => {
             const path = window.location.pathname;
 
             if (path === "/") selectedKeys.value = ["1"];
-
-            // Sản phẩm /product/:id
             else if (path.startsWith("/product")) selectedKeys.value = ["2"];
-
-            // Thương hiệu /brands hoặc /brandsnew/:id
             else if (path.startsWith("/brands") || path.startsWith("/brandsnew"))
                 selectedKeys.value = ["3"];
-
-            // Giới thiệu
             else if (path.startsWith("/intro")) selectedKeys.value = ["4"];
-
-            // Liên hệ
             else if (path.startsWith("/contact")) selectedKeys.value = ["5"];
         };
 
-
-        /* ======================= LOGOUT ======================= */
         const handleLogout = () => {
             sessionStorage.removeItem("user");
             message.success("Đăng xuất thành công!");
             window.location.href = "/";
         };
 
-
-        /* ======================= USER PROFILE ======================= */
         const handleUserClick = () => {
             const user = sessionStorage.getItem("user");
             window.location.href = user ? "/infor" : "/login";
         };
 
-
-        /* ======================= CATEGORY NAVIGATE ======================= */
         const navigateToCategory = (id) => {
             window.location.href = `/product/${id}`;
         };
 
-
-        /* ======================= CART ======================= */
         const handleToCart = () => {
             const user = sessionStorage.getItem("user");
-
             if (user) window.location.href = "/cart";
             else message.warning("Vui lòng đăng nhập để vào giỏ hàng");
         };
 
-
         const handleLogin = () => (window.location.href = "/login");
 
-
-        /* ======================= ON MOUNT ======================= */
         onMounted(() => {
             checkLoginStatus();
             updateSelectedKey();
         });
-
 
         return {
             categories,
@@ -203,6 +180,7 @@ export default {
     }
 };
 </script>
+
 
 
 <style scoped>

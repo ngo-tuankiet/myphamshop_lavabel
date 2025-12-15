@@ -50,11 +50,25 @@
 </template>
 
 <script>
-import { MinusOutlined, PlusOutlined, HeartFilled } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
-import axios from 'axios';
+import { MinusOutlined, PlusOutlined, HeartFilled } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import axios from 'axios'
+import { useRuntimeConfig } from '#app'
 
 export default {
+    components: {
+        MinusOutlined,
+        HeartFilled,
+        PlusOutlined,
+    },
+
+    setup() {
+        const config = useRuntimeConfig()
+        return {
+            apiBase: config.public.apiBase
+        }
+    },
+
     data() {
         return {
             products: [],
@@ -65,132 +79,114 @@ export default {
             limit: 10,
             totalProducts: 0,
             likedProducts: []
-        };
-    },
-    components: {
-        MinusOutlined,
-        HeartFilled,
-        PlusOutlined,
+        }
     },
 
     methods: {
-        // ===================== GET LIST PRODUCT BY BRAND =====================
         async fetchProducts() {
-            const { id } = this.$route.params;
-
+            const { id } = this.$route.params
             try {
-                const response = await axios.get(`http://localhost:8000/api/user/products`, {
+                const response = await axios.get(`${this.apiBase}/api/user/products`, {
                     params: {
                         brand_id: id,
                         page: this.page,
                         limit: this.limit
                     }
-                });
-
-                // Laravel paginate → data.data
-                this.products = response.data.data.data;
-                this.totalProducts = response.data.data.total;
-
+                })
+                this.products = response.data.data.data
+                this.totalProducts = response.data.data.total
             } catch (error) {
-                console.error('Error fetching products:', error);
-                message.error('Có lỗi khi tải danh sách sản phẩm');
+                console.error(error)
+                message.error('Có lỗi khi tải danh sách sản phẩm')
             }
         },
 
-        // ===================== MODAL =====================
         showModal(product) {
-            this.selectedProduct = product;
-            this.isModalVisible = true;
+            this.selectedProduct = product
+            this.isModalVisible = true
         },
 
         handleCancel() {
-            this.isModalVisible = false;
-            this.quantity = 1;
+            this.isModalVisible = false
+            this.quantity = 1
         },
 
-        // ===================== CART =====================
-       async addToCart() {
-    try {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        if (!user) {
-            return message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng");
-        }
+        async addToCart() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem("user"))
+                if (!user) {
+                    return message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng")
+                }
 
-        const payload = {
-            user_id: user.id,
-            product_id: this.selectedProduct.id,
-            quantity: this.quantity
-        };
+                const payload = {
+                    user_id: user.id,
+                    product_id: this.selectedProduct.id,
+                    quantity: this.quantity
+                }
 
-        const response = await axios.post("http://localhost:8000/api/cart/add", payload);
+                const response = await axios.post(`${this.apiBase}/api/cart/add`, payload)
 
-        if (response.data.success) {
-            message.success("Đã thêm sản phẩm vào giỏ hàng");
-        } else {
-            message.error("Không thể thêm vào giỏ hàng");
-        }
+                if (response.data.success) {
+                    message.success("Đã thêm sản phẩm vào giỏ hàng")
+                } else {
+                    message.error("Không thể thêm vào giỏ hàng")
+                }
 
-        this.isModalVisible = false;
-        this.quantity = 1;
+                this.isModalVisible = false
+                this.quantity = 1
+            } catch (error) {
+                console.error(error)
+                message.error("Lỗi khi thêm vào giỏ hàng")
+            }
+        },
 
-    } catch (error) {
-        console.error("Add to Cart Error:", error);
-        message.error("Lỗi khi thêm vào giỏ hàng");
-    }
-},
-
-
-        // ===================== LIKE PRODUCT =====================
         async toggleLike(id) {
             try {
-                const user = JSON.parse(sessionStorage.getItem('user'));
+                const user = JSON.parse(sessionStorage.getItem('user'))
                 if (!user) {
-                    message.warning('Vui lòng đăng nhập để sử dụng chức năng này');
-                    return;
+                    return message.warning('Vui lòng đăng nhập')
                 }
 
-                const isLiked = this.likedProducts.includes(id);
+                const isLiked = this.likedProducts.includes(id)
+                const url = `${this.apiBase}/api/favourites/${id}`
+                const method = isLiked ? 'DELETE' : 'POST'
 
-                const url = `http://localhost:8000/api/favourites/${id}`;
-                const method = isLiked ? "DELETE" : "POST";
-
-                const res = await fetch(url, { method });
+                const res = await fetch(url, { method })
 
                 if (res.ok) {
-                    if (isLiked) {
-                        this.likedProducts = this.likedProducts.filter(x => x !== id);
-                    } else {
-                        this.likedProducts.push(id);
-                    }
+                    this.likedProducts = isLiked
+                        ? this.likedProducts.filter(x => x !== id)
+                        : [...this.likedProducts, id]
 
-                    message.success(isLiked ? "Đã xoá khỏi yêu thích" : "Đã thêm vào yêu thích");
+                    message.success(isLiked ? 'Đã xoá khỏi yêu thích' : 'Đã thêm vào yêu thích')
                 } else {
-                    message.error("Không thể cập nhật yêu thích");
+                    message.error('Không thể cập nhật yêu thích')
                 }
-
             } catch (error) {
-                console.log("Error toggling like:", error);
-                message.error("Có lỗi khi cập nhật yêu thích");
+                console.error(error)
+                message.error('Có lỗi khi cập nhật yêu thích')
             }
         },
 
         incrementQuantity() {
-            this.quantity++;
+            this.quantity++
         },
+
         decrementQuantity() {
-            if (this.quantity > 1) this.quantity--;
+            if (this.quantity > 1) this.quantity--
         }
     },
 
     mounted() {
-        this.fetchProducts();
+        this.fetchProducts()
     },
 
     watch: {
         '$route.params': 'fetchProducts'
     }
-};
+}
 </script>
+
 
 <style scoped>
 .custom-card {

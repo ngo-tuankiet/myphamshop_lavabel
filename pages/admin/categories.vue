@@ -123,8 +123,8 @@ const handleOk = () => {
         confirmLoading.value = true
 
         const url = currentId.value
-            ? `${apiBase}/categories/${currentId.value}`
-            : `${apiBase}/categories`
+            ? `${apiBase}/api/categories/${currentId.value}`
+            : `${apiBase}/api/categories`
 
         const method = currentId.value ? "PUT" : "POST"
 

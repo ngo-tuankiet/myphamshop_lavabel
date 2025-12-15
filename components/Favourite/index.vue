@@ -29,7 +29,6 @@
             </a-col>
         </a-row>
 
-        <!-- Modal giỏ hàng -->
         <a-modal :visible="isModalVisible" title="Thông tin sản phẩm" @cancel="handleCancel" @ok="addToCart">
             <img :src="selectedProduct.image" style="max-width:100%" />
             <h3>{{ selectedProduct.name }}</h3>
@@ -48,12 +47,14 @@
 import { HeartOutlined } from "@ant-design/icons-vue";
 import axios from "axios";
 import { message } from "ant-design-vue";
+import { useRuntimeConfig } from "#app";
 
 export default {
     components: { HeartOutlined },
 
     data() {
         return {
+            apiBase: "",
             favouriteProducts: [],
             isModalVisible: false,
             selectedProduct: {},
@@ -62,34 +63,35 @@ export default {
     },
 
     mounted() {
-        this.fetchFavouriteProducts();
+        if (process.client) {
+            const config = useRuntimeConfig();
+            this.apiBase = config.public.apiBase;
+            this.fetchFavouriteProducts();
+        }
     },
 
     methods: {
-        // ======================== GET LIST ==========================
         async fetchFavouriteProducts() {
             const user = JSON.parse(sessionStorage.getItem("user"));
             if (!user) return message.warning("Vui lòng đăng nhập");
 
             try {
-                const res = await axios.get("http://localhost:8000/api/favourites", {
+                const res = await axios.get(`${this.apiBase}/api/favourites`, {
                     params: { user_id: user.id }
                 });
 
                 this.favouriteProducts = res.data.data;
             } catch (err) {
-                console.error(err);
                 message.error("Không thể tải danh sách yêu thích");
             }
         },
 
-        // ======================== REMOVE ==========================
         async removeFavourite(productId) {
             const user = JSON.parse(sessionStorage.getItem("user"));
             if (!user) return message.warning("Vui lòng đăng nhập");
 
             try {
-                await axios.delete("http://localhost:8000/api/favourites/remove", {
+                await axios.delete(`${this.apiBase}/api/favourites/remove`, {
                     data: {
                         user_id: user.id,
                         product_id: productId
@@ -100,12 +102,10 @@ export default {
                 message.success("Đã xóa khỏi yêu thích");
 
             } catch (err) {
-                console.error(err);
                 message.error("Không thể xóa yêu thích");
             }
         },
 
-        // ======================== MODAL ==========================
         showModal(product) {
             this.selectedProduct = product;
             this.isModalVisible = true;
@@ -116,13 +116,12 @@ export default {
             this.quantity = 1;
         },
 
-        // ======================== ADD TO CART ==========================
         async addToCart() {
             const user = JSON.parse(sessionStorage.getItem("user"));
             if (!user) return message.warning("Vui lòng đăng nhập");
 
             try {
-                await axios.post("http://localhost:8000/api/cart/add", {
+                await axios.post(`${this.apiBase}/api/cart/add`, {
                     user_id: user.id,
                     product_id: this.selectedProduct.id,
                     quantity: this.quantity
@@ -132,7 +131,6 @@ export default {
                 this.isModalVisible = false;
 
             } catch (err) {
-                console.error(err);
                 message.error("Không thể thêm vào giỏ hàng");
             }
         },
