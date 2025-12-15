@@ -7,7 +7,7 @@ use App\Models\Brand;
 use App\Models\BrandImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class BrandController extends Controller
 {
@@ -41,16 +41,16 @@ class BrandController extends Controller
                 'brand_name' => $request->brand_name,
             ]);
 
-            // Xử lý ảnh
             if ($request->hasFile('logo_image')) {
-                $path = $request->file('logo_image')->store('brands', 'public');
-
-                // Chuẩn hoá đường dẫn ảnh
-                $cleanPath = trim($path);
+                $upload = Cloudinary::upload(
+                    $request->file('logo_image')->getRealPath(),
+                    ['folder' => 'brands']
+                );
 
                 BrandImage::create([
                     'brand_id' => $brand->id,
-                    'url' => $cleanPath,
+                    'url' => $upload['secure_url'],
+                    'public_id' => $upload['public_id'],
                 ]);
             }
 
@@ -62,6 +62,7 @@ class BrandController extends Controller
                 'message' => 'Thêm thương hiệu thành công.',
                 'data' => $brand,
             ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -70,6 +71,7 @@ class BrandController extends Controller
             ], 500);
         }
     }
+
 
     public function edit($id)
     {
@@ -90,7 +92,7 @@ class BrandController extends Controller
         $brand = Brand::findOrFail($id);
 
         $request->validate([
-            'brand_name' => 'required|string|max:255|unique:brands,brand_name,' . $brand->id . ',id',
+            'brand_name' => 'required|string|max:255|unique:brands,brand_name,' . $brand->id,
             'logo_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -101,21 +103,23 @@ class BrandController extends Controller
                 'brand_name' => $request->brand_name,
             ]);
 
-            // Nếu có ảnh mới → xoá ảnh cũ + thêm ảnh mới
             if ($request->hasFile('logo_image')) {
 
-                if ($oldLogo = $brand->logo) {
-                    Storage::disk('public')->delete(trim($oldLogo->url));
-                    $oldLogo->delete();
+                // Xóa ảnh cũ trên Cloudinary
+                if ($brand->logo && $brand->logo->public_id) {
+                    Cloudinary::destroy($brand->logo->public_id);
+                    $brand->logo()->delete();
                 }
 
-                // Upload ảnh mới
-                $path = $request->file('logo_image')->store('brands', 'public');
-                $cleanPath = trim($path);
+                $upload = Cloudinary::upload(
+                    $request->file('logo_image')->getRealPath(),
+                    ['folder' => 'brands']
+                );
 
                 BrandImage::create([
                     'brand_id' => $brand->id,
-                    'url' => $cleanPath,
+                    'url' => $upload['secure_url'],
+                    'public_id' => $upload['public_id'],
                 ]);
             }
 
@@ -127,6 +131,7 @@ class BrandController extends Controller
                 'message' => 'Cập nhật thương hiệu thành công.',
                 'data' => $brand,
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -135,6 +140,7 @@ class BrandController extends Controller
             ], 500);
         }
     }
+
 
     public function destroy($id)
     {
@@ -149,15 +155,18 @@ class BrandController extends Controller
         DB::beginTransaction();
 
         try {
-            if ($brand->logo) {
-                Storage::disk('public')->delete(trim($brand->logo->url));
+            if ($brand->logo && $brand->logo->public_id) {
+                Cloudinary::destroy($brand->logo->public_id);
                 $brand->logo()->delete();
             }
 
             $brand->delete();
             DB::commit();
 
-            return response()->json(['message' => 'Xóa thương hiệu thành công.'], 200);
+            return response()->json([
+                'message' => 'Xóa thương hiệu thành công.'
+            ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -166,4 +175,5 @@ class BrandController extends Controller
             ], 500);
         }
     }
+
 }
