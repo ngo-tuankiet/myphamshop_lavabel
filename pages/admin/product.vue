@@ -277,7 +277,7 @@ const submitForm = async () => {
     if (hasFile) {
       const imgFD = new FormData()
       fileList.value.forEach(f => f.originFileObj && imgFD.append("images[]", f.originFileObj))
-      await apiFetch(`/products/${productId}/images`, { method: "POST", body: imgFD })
+      await apiFetch(`/api/products/${productId}/images`, { method: "POST", body: imgFD })
     }
 
     message.success(editingId.value ? "Cập nhật thành công" : "Thêm sản phẩm thành công")
