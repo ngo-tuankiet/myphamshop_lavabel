@@ -14,5 +14,8 @@ export default defineNuxtConfig({
     },
     layoutTransition: true // optional
   },
-
+  ssr: true,
+  nitro: {
+    preset: 'vercel'
+  }
 })
