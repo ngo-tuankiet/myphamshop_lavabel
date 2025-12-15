@@ -105,3 +105,7 @@ Route::get('/user/brands', [UserBrandController::class, 'index']);
 Route::get('/favourites', [FavouriteController::class, 'index']);
 Route::post('/favourites/add', [FavouriteController::class, 'store']);
 Route::delete('/favourites/remove', [FavouriteController::class, 'destroy']);
+
+Route::get('/db-test', function () {
+    return DB::select('SELECT 1');
+});
