@@ -167,7 +167,7 @@ const handleEdit = (record) => {
 
 // Delete
 const handleDelete = async (id) => {
-    const res = await fetch(`${apiBase}/categories/${id}`, {
+    const res = await fetch(`${apiBase}/api/categories/${id}`, {
         method: "DELETE",
     })
 
@@ -181,7 +181,7 @@ const handleDelete = async (id) => {
 
 // Get list categories
 const fetchCategories = async () => {
-    const res = await fetch(`${apiBase}/categories`, { signal })
+    const res = await fetch(`${apiBase}/api/categories`, { signal })
     const json = await res.json()
     categories.value = json.data
 }
