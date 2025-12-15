@@ -228,7 +228,6 @@ import {
 
 definePageMeta({
   layout: 'admin',
-  keepalive: false,
 })
 
 const { public: { apiBase } } = useRuntimeConfig();

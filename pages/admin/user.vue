@@ -76,7 +76,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 
-definePageMeta({ layout: 'admin', keepalive: false })
+definePageMeta({ layout: 'admin'})
 
 // === RUNTIME CONFIG ===
 const config = useRuntimeConfig()
