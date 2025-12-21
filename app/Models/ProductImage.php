@@ -18,16 +18,6 @@ class ProductImage extends Model
         'url',
     ];
 
-    public function getUrlAttribute($value)
-    {
-        return asset('storage/' . $value);
-    }
-
-    public function getRawUrlAttribute()
-    {
-        return $this->attributes['url'];
-    }
-
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');

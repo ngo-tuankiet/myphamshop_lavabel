@@ -157,7 +157,6 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        // Validate cho cả trường hợp 1 ảnh hoặc nhiều ảnh
         $request->validate([
             'images' => 'required',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -171,10 +170,8 @@ class ProductController extends Controller
                 $image->delete();
             }
 
-            // Lấy files - xử lý cả trường hợp 1 ảnh hoặc nhiều ảnh
             $files = $request->file('images');
 
-            // Nếu là single file, chuyển thành array
             if (!is_array($files)) {
                 $files = [$files];
             }
