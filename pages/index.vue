@@ -16,7 +16,7 @@
                 <a-col :span="6" v-for="product in products" :key="product.id">
                     <a-card class="custom-card" hoverable>
                         <div class="imgProduct">
-                            <img :src="product.images?.[0]?.url" alt="Product Image" />
+                            <img :src="product.images?.url" alt="Product Image" />
                         </div>
 
                         <div class="content">
@@ -45,7 +45,7 @@
         <!-- MODAL -->
         <a-modal :visible="isModalVisible" title="Thông tin sản phẩm"
                  @cancel="handleCancel" @ok="addToCart">
-            <img :src="selectedProduct.images?.[0]?.url" style="max-width: 100%;" />
+            <img :src="selectedProduct.images?.url" style="max-width: 100%;" />
 
             <h3>{{ selectedProduct.name }}</h3>
             <p class="price">{{ selectedProduct.formatted_price ?? selectedProduct.price }}</p>
