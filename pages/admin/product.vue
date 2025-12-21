@@ -276,7 +276,7 @@ const submitForm = async () => {
     const hasFile = fileList.value.some(f => f.originFileObj)
     if (hasFile) {
       const imgFD = new FormData()
-      fileList.value.forEach(f => f.originFileObj && imgFD.append("images[]", f.originFileObj))
+      fileList.value.forEach(f => f.originFileObj && imgFD.append("images", f.originFileObj))
       await apiFetch(`/api/products/${productId}/images`, { method: "POST", body: imgFD })
     }
 
