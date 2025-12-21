@@ -25,14 +25,6 @@
 
         <template #bodyCell="{ column, record }">
 
-          <!-- LOGO -->
-          <template v-if="column.key === 'logo'">
-            <img
-              :src="getLogo(record)"
-              style="width:60px;height:60px;object-fit:contain;border-radius:4px;"
-            />
-          </template>
-
           <!-- ACTION -->
           <template v-if="column.key === 'action'">
             <a-space>
@@ -59,10 +51,6 @@
 
           <a-form-item label="Tên thương hiệu" required>
             <a-input v-model:value="form.brand_name" />
-          </a-form-item>
-
-          <a-form-item label="Logo">
-            <input type="file" @change="handleFileUpload" />
           </a-form-item>
 
         </a-form>
@@ -93,23 +81,13 @@ const editId = ref(null);
 
 const form = ref({
   brand_name: "",
-  logo_image: null
 });
 
 // TABLE COLUMNS
 const columns = [
-  { title: "Logo", key: "logo" },
   { title: "Tên thương hiệu", dataIndex: "brand_name" },
   { title: "Thao tác", key: "action" }
 ];
-
-// GET LOGO URL
-function getLogo(record) {
-  if (record.logo?.url) {
-    return `${apiBase.replace('/api','')}/storage/${record.logo.url}`;
-  }
-  return "https://placehold.co/60x60?text=No+Logo";
-}
 
 // FETCH LIST
 async function fetchBrands() {
@@ -128,7 +106,6 @@ function openAddModal() {
   modalVisible.value = true;
   modalTitle.value = "Thêm thương hiệu";
   editId.value = null;
-  form.value = { brand_name: "", logo_image: null };
 }
 
 // OPEN EDIT
@@ -138,13 +115,8 @@ function openEditModal(record) {
   editId.value = record.id;
 
   form.value.brand_name = record.brand_name;
-  form.value.logo_image = null;
 }
 
-// UPLOAD FILE
-function handleFileUpload(e) {
-  form.value.logo_image = e.target.files[0];
-}
 
 // SAVE (create + update)
 async function handleSave() {
@@ -152,10 +124,6 @@ async function handleSave() {
 
   const fd = new FormData();
   fd.append("brand_name", form.value.brand_name);
-
-  if (form.value.logo_image) {
-    fd.append("logo_image", form.value.logo_image);
-  }
 
   let url = API;
 
