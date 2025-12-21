@@ -7,7 +7,7 @@
                 <a-card class="custom-card" hoverable style="margin-top: 10px;">
                     
                     <div class="imgProduct">
-                        <img :src="product.image ?? product.main_image" alt="Image" />
+                        <img :src="product.image" alt="Image" />
                     </div>
 
                     <div class="content">
