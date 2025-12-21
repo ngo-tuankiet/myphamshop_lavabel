@@ -34,18 +34,15 @@ class FavouriteController extends Controller
         // Convert URL ảnh sang dạng FULL PATH để FE load không lỗi
         $favourites->transform(function ($item) {
 
-            if ($item->image) {
-                $cleanPath = ltrim($item->image, '/');
-
-                $item->image = url('storage/' . $cleanPath);
-            } else {
-                $item->image = url('storage/default.webp');
-            } 
+            // URL từ Cloudinary → dùng trực tiếp
+            $item->image = $item->image
+                ?? 'https://via.placeholder.com/300x300?text=No+Image';
 
             $item->formatted_price = number_format($item->price, 0, ',', '.') . 'đ';
 
             return $item;
         });
+
 
         return response()->json([
             "success" => true,
