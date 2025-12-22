@@ -270,7 +270,6 @@ const columns = [
 // Cột chi tiết sản phẩm trong đơn
 const detailColumns = [
   {
-    title: "Hình ảnh",
     dataIndex: "product",
     width: 80,
   },
