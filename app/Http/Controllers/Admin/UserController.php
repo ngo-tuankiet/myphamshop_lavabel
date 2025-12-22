@@ -100,7 +100,7 @@ class UserController extends Controller
             if ($user->orders()->exists()) {
                 return response()->json([
                     'error' => 'Không thể xóa người dùng này vì họ đã có đơn hàng liên kết. Vui lòng xử lý đơn hàng trước.'
-                ], 409); 
+                ], 409);
             }
 
             $user->favourites()->detach();

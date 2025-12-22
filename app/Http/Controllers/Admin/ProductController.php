@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -213,12 +212,6 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            // Xóa tất cả ảnh trên Cloudinary
-            $product->images->each(function ($image) {
-                if ($image->public_id) {
-                    Cloudinary::destroy($image->public_id);
-                }
-            });
 
             $product->images()->delete();
             $product->delete();

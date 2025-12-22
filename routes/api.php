@@ -90,10 +90,6 @@ Route::prefix('admin')->group(function () {
 
 // Trang chủ
 Route::get('/home/hotProducts', [UserProductController::class, 'getHotProducts']);
-Route::get('/home/brands', [UserProductController::class, 'getBrands']);
-Route::get('/home/makeupProducts', [UserProductController::class, 'getMakeupProducts']);
-Route::get('/home/lipstickProducts', [UserProductController::class, 'getLipstickProducts']);
-Route::get('/home/skincareProducts', [UserProductController::class, 'getSkincareProducts']);
 
 // User products - đặt route cụ thể lên trước
 Route::get('/user/products', [UserProductController::class, 'index']);

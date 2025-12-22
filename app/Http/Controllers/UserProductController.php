@@ -38,68 +38,9 @@ class UserProductController extends Controller
         ], 200);
     }
 
-    public function getHotProducts(int $limit = 5): Collection
+    public function getHotProducts(int $limit = 10): Collection
     {
         return Product::with(['brand', 'images'])
-            ->orderByDesc('id')
-            ->limit($limit)
-            ->get()
-            ->map(function ($product) {
-                return $this->formatProductData($product);
-            });
-    }
-
-    public function getBrands(int $limit = 6): Collection
-    {
-        return Brand::with('logo')
-            ->orderBy('brand_name')
-            ->limit($limit)
-            ->get()
-            ->map(function ($brand) {
-                $imageUrl = $brand->logo->url ?? '../default_brand.webp';
-
-                return [
-                    'id' => $brand->id,
-                    'brand_name' => $brand->brand_name,
-                    'image' => $imageUrl,
-                ];
-            });
-    }
-
-    public function getMakeupProducts(int $limit = 8): Collection
-    {
-        $makeup_category_id = 46;
-
-        return Product::with(['brand', 'images'])
-            ->where('subcategory_id', $makeup_category_id)
-            ->orderByDesc('id')
-            ->limit($limit)
-            ->get()
-            ->map(function ($product) {
-                return $this->formatProductData($product);
-            });
-    }
-
-    public function getLipstickProducts(int $limit = 8): Collection
-    {
-        $lipstick_category_id = 55;
-
-        return Product::with(['brand', 'images'])
-            ->where('subcategory_id', $lipstick_category_id)
-            ->orderByDesc('id')
-            ->limit($limit)
-            ->get()
-            ->map(function ($product) {
-                return $this->formatProductData($product);
-            });
-    }
-
-    public function getSkincareProducts(int $limit = 8): Collection
-    {
-        $skincare_category_ids = [47, 48];
-
-        return Product::with(['brand', 'images'])
-            ->whereIn('subcategory_id', $skincare_category_ids)
             ->orderByDesc('id')
             ->limit($limit)
             ->get()
