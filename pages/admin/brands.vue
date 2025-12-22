@@ -1,7 +1,6 @@
 <template>
   <div>
     <a-card title="Quản lý Thương hiệu">
-
       <!-- BUTTON THÊM -->
       <template #extra>
         <a-button type="primary" @click="openAddModal">
@@ -15,29 +14,28 @@
           v-model:value="search"
           placeholder="Tìm kiếm thương hiệu..."
           style="width: 300px"
-          @pressEnter="fetchBrands"
-        />
+          @pressEnter="fetchBrands" />
         <a-button @click="fetchBrands">Tìm</a-button>
       </div>
 
       <!-- TABLE -->
       <a-table :columns="columns" :data-source="brands" rowKey="id">
-
         <template #bodyCell="{ column, record }">
-
           <!-- ACTION -->
           <template v-if="column.key === 'action'">
             <a-space>
-              <a-button type="primary" @click="openEditModal(record)">Sửa</a-button>
+              <a-button type="primary" @click="openEditModal(record)"
+                >Sửa</a-button
+              >
 
-              <a-popconfirm title="Xóa thương hiệu?" @confirm="deleteBrand(record.id)">
+              <a-popconfirm
+                title="Xóa thương hiệu?"
+                @confirm="deleteBrand(record.id)">
                 <a-button danger>Xóa</a-button>
               </a-popconfirm>
             </a-space>
           </template>
-
         </template>
-
       </a-table>
 
       <!-- MODAL -->
@@ -45,17 +43,13 @@
         v-model:visible="modalVisible"
         :title="modalTitle"
         @ok="handleSave"
-        :confirmLoading="loading"
-      >
+        :confirmLoading="loading">
         <a-form layout="vertical">
-
           <a-form-item label="Tên thương hiệu" required>
             <a-input v-model:value="form.brand_name" />
           </a-form-item>
-
         </a-form>
       </a-modal>
-
     </a-card>
   </div>
 </template>
@@ -66,7 +60,9 @@ import { message } from "ant-design-vue";
 
 definePageMeta({ layout: "admin" });
 
-const { public: { apiBase } } = useRuntimeConfig();
+const {
+  public: { apiBase },
+} = useRuntimeConfig();
 
 // API
 const API = `${apiBase}/api/brands`;
@@ -86,7 +82,7 @@ const form = ref({
 // TABLE COLUMNS
 const columns = [
   { title: "Tên thương hiệu", dataIndex: "brand_name" },
-  { title: "Thao tác", key: "action" }
+  { title: "Thao tác", key: "action" },
 ];
 
 // FETCH LIST
@@ -117,7 +113,6 @@ function openEditModal(record) {
   form.value.brand_name = record.brand_name;
 }
 
-
 // SAVE (create + update)
 async function handleSave() {
   loading.value = true;
@@ -138,7 +133,6 @@ async function handleSave() {
     message.success(editId.value ? "Cập nhật thành công" : "Thêm thành công");
     modalVisible.value = false;
     fetchBrands();
-
   } catch (err) {
     message.error("Lỗi khi lưu");
   }
@@ -156,7 +150,6 @@ async function deleteBrand(id) {
 
     message.success("Đã xóa!");
     fetchBrands();
-
   } catch (err) {
     message.error("Không thể xóa thương hiệu");
   }
@@ -164,7 +157,6 @@ async function deleteBrand(id) {
 
 fetchBrands();
 </script>
-
 
 <style scoped>
 .mb-4 {

@@ -58,9 +58,6 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue"
 import { message } from "ant-design-vue"
-import { useRouter } from "vue-router"
-
-const router = useRouter()
 
 definePageMeta({
     layout: "admin",
